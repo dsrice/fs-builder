@@ -1,2 +1,2 @@
-# fs-builder
+# fsb
 GoのSQLBuilder
