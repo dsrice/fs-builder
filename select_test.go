@@ -2,28 +2,49 @@ package fsb_test
 
 import (
 	"fsb"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
-type User struct {
+type user struct {
 	ID int
 }
 
-func (u *User) TableName() string {
+func (u *user) TableName() string {
 	return "user"
 }
 
-func Test_Select_Model(t *testing.T) {
-	sb := fsb.Select().From(&User{})
-	sql := sb.ToSQL()
-
-	assert.Equal(t, "SELECT * FROM user;", sql)
+type SelectSuite struct {
+	suite.Suite
 }
 
-func Test_Select_String(t *testing.T) {
-	sb := fsb.Select().From("user")
-	sql := sb.ToSQL()
+func (s *SelectSuite) Test_Select_Model() {
+	sb := fsb.Select().From(&user{})
+	sql, err := sb.ToSQL()
 
-	assert.Equal(t, "SELECT * FROM user;", sql)
+	assert.Equal(s.T(), "SELECT * FROM user;", sql)
+	assert.Nil(s.T(), err)
+}
+
+func (s *SelectSuite) Test_Select_String() {
+	sb := fsb.Select().From("user")
+	sql, err := sb.ToSQL()
+
+	assert.Equal(s.T(), "SELECT * FROM user;", sql)
+	assert.Nil(s.T(), err)
+}
+
+func (s *SelectSuite) Test_Select_Failed() {
+	sb := fsb.Select().From(1)
+	sql, err := sb.ToSQL()
+
+	assert.Equal(s.T(), "", sql)
+	assert.NotNil(s.T(), err)
+	assert.Equal(s.T(), "failed set table", err.Error())
+}
+
+func TestSelectSuite(t *testing.T) {
+	suite.Run(t, new(SelectSuite))
 }

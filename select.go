@@ -1,6 +1,7 @@
 package fsb
 
 import (
+	"errors"
 	"fmt"
 	"fsb/dataset"
 )
@@ -18,24 +19,30 @@ func Select() *SelectContainer {
 func (s *SelectContainer) From(table interface{}) *SelectContainer {
 	tc := dataset.TableContainer{}
 
-	switch table.(type) {
+	switch t := table.(type) {
 	case dataset.Table:
 		p := table.(dataset.Table)
 		tc.Name = p.TableName()
 	case string:
-		tc.Name = table.(string)
+		tc.Name = t
+	default:
+		s.errs = []error{fmt.Errorf("failed set table")}
 	}
 
 	s.table = &tc
 	return s
 }
 
-func (s *SelectContainer) ToSQL() string {
+func (s *SelectContainer) ToSQL() (string, error) {
 	sql := "SELECT *"
+
+	if len(s.errs) > 0 {
+		return "", errors.Join(s.errs...)
+	}
 
 	if s.table != nil {
 		sql = fmt.Sprintf("%s FROM %s", sql, s.table.Name)
 	}
 
-	return fmt.Sprintf("%s;", sql)
+	return fmt.Sprintf("%s;", sql), nil
 }
