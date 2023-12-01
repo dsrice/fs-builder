@@ -16,9 +16,16 @@ func Select() *SelectContainer {
 }
 
 func (s *SelectContainer) From(table interface{}) *SelectContainer {
-	p := table.(dataset.Table)
+	tc := dataset.TableContainer{}
 
-	tc := dataset.TableContainer{Name: p.TableName()}
+	switch table.(type) {
+	case dataset.Table:
+		p := table.(dataset.Table)
+		tc.Name = p.TableName()
+	case string:
+		tc.Name = table.(string)
+	}
+
 	s.table = &tc
 	return s
 }
