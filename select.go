@@ -17,7 +17,6 @@ func Select() *SelectContainer {
 
 func (s *SelectContainer) From(table interface{}) *SelectContainer {
 	p := table.(dataset.Table)
-	println(p.TableName())
 
 	tc := dataset.TableContainer{Name: p.TableName()}
 	s.table = &tc
