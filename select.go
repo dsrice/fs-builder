@@ -13,23 +13,19 @@ type SelectContainer struct {
 }
 
 func Select() *SelectContainer {
-	return &SelectContainer{}
+	return &SelectContainer{table: &dataset.TableContainer{}}
 }
 
 func (s *SelectContainer) From(table interface{}) *SelectContainer {
-	tc := dataset.TableContainer{}
-
 	switch t := table.(type) {
 	case dataset.Table:
-		p := table.(dataset.Table)
-		tc.Name = p.TableName()
+		s.table.Name = table.(dataset.Table).TableName()
 	case string:
-		tc.Name = t
+		s.table.Name = t
 	default:
 		s.errs = []error{fmt.Errorf("failed set table")}
 	}
 
-	s.table = &tc
 	return s
 }
 
