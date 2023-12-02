@@ -20,7 +20,7 @@ type SelectSuite struct {
 	suite.Suite
 }
 
-func (s *SelectSuite) Test_Select_Model() {
+func (s *SelectSuite) Test_SelectModel() {
 	sb := fsb.Select().From(&user{})
 	sql, err := sb.ToSQL()
 
@@ -28,11 +28,27 @@ func (s *SelectSuite) Test_Select_Model() {
 	assert.Nil(s.T(), err)
 }
 
-func (s *SelectSuite) Test_Select_String() {
+func (s *SelectSuite) Test_SelectModel_Field() {
+	sb := fsb.Select().Field("id", "name").From(&user{})
+	sql, err := sb.ToSQL()
+
+	assert.Equal(s.T(), "SELECT id, name FROM user;", sql)
+	assert.Nil(s.T(), err)
+}
+
+func (s *SelectSuite) Test_SelectString() {
 	sb := fsb.Select().From("user")
 	sql, err := sb.ToSQL()
 
 	assert.Equal(s.T(), "SELECT * FROM user;", sql)
+	assert.Nil(s.T(), err)
+}
+
+func (s *SelectSuite) Test_SelectString_Field() {
+	sb := fsb.Select().Field("id").From("user")
+	sql, err := sb.ToSQL()
+
+	assert.Equal(s.T(), "SELECT id FROM user;", sql)
 	assert.Nil(s.T(), err)
 }
 

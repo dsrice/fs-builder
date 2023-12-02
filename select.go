@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"fsb/dataset"
+	"strings"
 )
 
 type SelectContainer struct {
@@ -13,7 +14,16 @@ type SelectContainer struct {
 }
 
 func Select() *SelectContainer {
-	return &SelectContainer{table: &dataset.TableContainer{}}
+	return &SelectContainer{
+		table: &dataset.TableContainer{},
+		field: []string{},
+	}
+}
+
+func (s *SelectContainer) Field(fields ...string) *SelectContainer {
+	s.field = fields
+
+	return s
 }
 
 func (s *SelectContainer) From(table interface{}) *SelectContainer {
@@ -30,15 +40,22 @@ func (s *SelectContainer) From(table interface{}) *SelectContainer {
 }
 
 func (s *SelectContainer) ToSQL() (string, error) {
-	sql := "SELECT *"
-
 	if len(s.errs) > 0 {
 		return "", errors.Join(s.errs...)
 	}
 
-	if s.table != nil {
-		sql = fmt.Sprintf("%s FROM %s", sql, s.table.Name)
+	sqlElements := []string{"SELECT"}
+
+	if len(s.field) > 0 {
+		sqlElements = append(sqlElements, strings.Join(s.field, ", "))
+	} else {
+		sqlElements = append(sqlElements, "*")
 	}
 
-	return fmt.Sprintf("%s;", sql), nil
+	if s.table != nil {
+		sqlElements = append(sqlElements, "FROM")
+		sqlElements = append(sqlElements, s.table.Name)
+	}
+
+	return fmt.Sprintf("%s;", strings.Join(sqlElements, " ")), nil
 }
