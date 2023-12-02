@@ -5,5 +5,6 @@ type Table interface {
 }
 
 type TableContainer struct {
-	Name string
+	Name    string
+	Dataset *Table
 }

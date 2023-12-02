@@ -8,11 +8,12 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type user struct {
-	ID int
+type User struct {
+	ID   int    `db:"id"`
+	Name string `db:"name"`
 }
 
-func (u *user) TableName() string {
+func (u *User) TableName() string {
 	return "user"
 }
 
@@ -21,15 +22,15 @@ type SelectSuite struct {
 }
 
 func (s *SelectSuite) Test_SelectModel() {
-	sb := fsb.Select().From(&user{})
+	sb := fsb.Select().From(&User{})
 	sql, err := sb.ToSQL()
 
-	assert.Equal(s.T(), "SELECT * FROM user;", sql)
+	assert.Equal(s.T(), "SELECT id, name FROM user;", sql)
 	assert.Nil(s.T(), err)
 }
 
 func (s *SelectSuite) Test_SelectModel_Field() {
-	sb := fsb.Select().Field("id", "name").From(&user{})
+	sb := fsb.Select().Field("id", "name").From(&User{})
 	sql, err := sb.ToSQL()
 
 	assert.Equal(s.T(), "SELECT id, name FROM user;", sql)
