@@ -6,6 +6,8 @@ type Expression struct {
 	condition string
 }
 
+// Eq
+// 等号条件
 func Eq(target string, comp interface{}) *Expression {
 	var cond string
 	switch v := comp.(type) {
