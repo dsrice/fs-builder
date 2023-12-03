@@ -3,20 +3,25 @@ package fsb
 import (
 	"errors"
 	"fmt"
-	"fsb/dataset"
 	"strings"
 )
 
 type SelectContainer struct {
 	field []string
-	table *dataset.TableContainer
+	table *TableContainer
 	errs  []error
 }
 
-func Select() *SelectContainer {
+func Select(fields ...string) *SelectContainer {
+	var f []string
+
+	if len(fields) > 0 {
+		f = fields
+	}
+
 	return &SelectContainer{
-		table: &dataset.TableContainer{},
-		field: []string{},
+		table: &TableContainer{},
+		field: f,
 	}
 }
 
@@ -26,15 +31,8 @@ func (s *SelectContainer) Field(fields ...string) *SelectContainer {
 	return s
 }
 
-func (s *SelectContainer) From(table interface{}) *SelectContainer {
-	switch t := table.(type) {
-	case dataset.Table:
-		s.table.Name = table.(dataset.Table).TableName()
-	case string:
-		s.table.Name = t
-	default:
-		s.errs = []error{fmt.Errorf("failed set table")}
-	}
+func (s *SelectContainer) From(table TableContainer) *SelectContainer {
+	s.table = &table
 
 	return s
 }
@@ -53,8 +51,7 @@ func (s *SelectContainer) ToSQL() (string, error) {
 	}
 
 	if s.table != nil {
-		sqlElements = append(sqlElements, "FROM")
-		sqlElements = append(sqlElements, s.table.Name)
+		sqlElements = append(sqlElements, "FROM", s.table.name)
 	}
 
 	return fmt.Sprintf("%s;", strings.Join(sqlElements, " ")), nil
