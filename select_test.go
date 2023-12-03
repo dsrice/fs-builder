@@ -101,6 +101,29 @@ func (s *SelectSuite) Test_SelectString_WhereOrAnd() {
 	assert.Equal(s.T(), "SELECT * FROM users WHERE name = 'test' OR (id = 1 AND id = 2);", sql)
 	assert.Nil(s.T(), err)
 }
+
+func (s *SelectSuite) Test_SelectString_WhereMulti() {
+	sb := fsb.Select().
+		From(fsb.Table("users")).
+		Where(fsb.Eq("name", "test").
+			OR(
+				fsb.Eq("id", 1).AND(fsb.Eq("id", 2)),
+			).
+			AND(
+				fsb.Eq("login_id", "test2").AND(fsb.Eq("name", "name2")),
+			),
+		)
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(
+		s.T(),
+		"SELECT * FROM users WHERE name = 'test' OR (id = 1 AND id = 2) AND login_id = 'test2' AND name = 'name2';",
+		sql,
+	)
+	assert.Nil(s.T(), err)
+}
+
 func TestSelectSuite(t *testing.T) {
 	suite.Run(t, new(SelectSuite))
 }
