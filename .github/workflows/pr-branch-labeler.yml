@@ -1,13 +1,21 @@
-name: PR Branch Labeler
-
-on: pull_request
+name: Restrict pr label
+on:
+  pull_request_target:
+    types: [opened, edited, synchronize]
 
 jobs:
-  label_prs:
+  restrict-pr-label:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
-      - name: Label PRs
-        if: github.event.action == 'opened' # Only run the action when the PR was first opened
-        uses: ffittschen/pr-branch-labeler@v1
+      - uses: agaroot-technologies/action-restrict-pr-label@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          rules: |
+            main <- development [release] [production]
+            development <- feature/* [feature]
+            development <- bugfix/* [bugfix]
+            development <- refactor/* [refactor]
+            development <- chore/* [chore]
