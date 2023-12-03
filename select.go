@@ -9,6 +9,7 @@ import (
 type SelectContainer struct {
 	field []string
 	table *TableContainer
+	where *Expression
 	errs  []error
 }
 
@@ -25,14 +26,14 @@ func Select(fields ...string) *SelectContainer {
 	}
 }
 
-func (s *SelectContainer) Field(fields ...string) *SelectContainer {
-	s.field = fields
+func (s *SelectContainer) From(table *TableContainer) *SelectContainer {
+	s.table = table
 
 	return s
 }
 
-func (s *SelectContainer) From(table TableContainer) *SelectContainer {
-	s.table = &table
+func (s *SelectContainer) Where(conditions *Expression) *SelectContainer {
+	s.where = conditions
 
 	return s
 }
@@ -52,6 +53,10 @@ func (s *SelectContainer) ToSQL() (string, error) {
 
 	if s.table != nil {
 		sqlElements = append(sqlElements, "FROM", s.table.name)
+	}
+
+	if s.where != nil {
+		sqlElements = append(sqlElements, "WHERE", s.where.condition)
 	}
 
 	return fmt.Sprintf("%s;", strings.Join(sqlElements, " ")), nil
