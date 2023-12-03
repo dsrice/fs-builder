@@ -27,6 +27,7 @@ func (s *SelectSuite) Test_SelectString_Field() {
 	assert.Equal(s.T(), "SELECT id FROM users;", sql)
 	assert.Nil(s.T(), err)
 }
+
 func TestSelectSuite(t *testing.T) {
 	suite.Run(t, new(SelectSuite))
 }

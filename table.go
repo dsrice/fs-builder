@@ -5,13 +5,15 @@ type TableContainer struct {
 	bName string
 }
 
-func Table(t string) TableContainer {
-	return TableContainer{
+func Table(t string) *TableContainer {
+	return &TableContainer{
 		name:  t,
 		bName: t,
 	}
 }
 
-func (t *TableContainer) As(tName string) {
+func (t *TableContainer) As(tName string) *TableContainer {
 	t.name = tName
+
+	return t
 }

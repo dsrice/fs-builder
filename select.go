@@ -31,8 +31,8 @@ func (s *SelectContainer) Field(fields ...string) *SelectContainer {
 	return s
 }
 
-func (s *SelectContainer) From(table TableContainer) *SelectContainer {
-	s.table = &table
+func (s *SelectContainer) From(table *TableContainer) *SelectContainer {
+	s.table = table
 
 	return s
 }
