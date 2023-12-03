@@ -2,11 +2,12 @@ package fsb_test
 
 import (
 	"fsb"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/suite"
 	"reflect"
 	"testing"
 	"unsafe"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
 type TableSuite struct {

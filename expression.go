@@ -8,11 +8,11 @@ type Expression struct {
 
 func Eq(target string, comp interface{}) *Expression {
 	var cond string
-	switch comp.(type) {
+	switch v := comp.(type) {
 	case string:
-		cond = fmt.Sprintf("%s = '%s'", target, comp.(string))
+		cond = fmt.Sprintf("%s = '%s'", target, v)
 	case int:
-		cond = fmt.Sprintf("%s = %d", target, comp.(int))
+		cond = fmt.Sprintf("%s = %d", target, v)
 	}
 
 	return &Expression{
