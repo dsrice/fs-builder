@@ -5,13 +5,17 @@ import (
 	"strings"
 )
 
+// AND combines the current expression with another expression using the AND operator.
+// If the other expression contains the OR operator, the current expression will be enclosed in brackets.
 type Expression struct {
 	condition  string
 	bracketFlg bool
 }
 
-// Eq
-// 等号条件
+// Eq is a function that creates an Expression with a specific condition based on the target and comparison value.
+// It can handle string and int comparison values.
+// The condition is built using the fmt.Sprintf function to format the target and comparison value appropriately.
+// The function returns a pointer to an Expression struct initialized with the condition.
 func Eq(target string, comp interface{}) *Expression {
 	var cond string
 	switch v := comp.(type) {
@@ -26,8 +30,23 @@ func Eq(target string, comp interface{}) *Expression {
 	}
 }
 
-// AND
-// AND条件設定
+// AND sets the condition of the Expression object with the logical AND operator.
+// If the exp.condition contains the string "OR", it appends the condition in brackets with the AND operator.
+// Otherwise, it appends the condition with the AND operator without brackets.
+//
+// Example usage:
+//
+//	exp := &Expression{condition: "name = 'test'"}
+//	newExp := exp.AND(&Expression{condition: "id = 1"})
+//	// Output: newExp.condition = "name = 'test' AND id = 1"
+//
+//	exp := &Expression{condition: "name = 'test'"}
+//	newExp := exp.AND(&Expression{condition: "id = 1 OR id = 2"})
+//	// Output: newExp.condition = "name = 'test' AND (id = 1 OR id = 2)"
+//
+//	exp := &Expression{condition: "name = 'test'"}
+//	newExp := exp.AND(&Expression{condition: "id = 1 AND id = 2"})
+//	// Output: newExp.condition = "name = 'test' AND (id = 1 AND id = 2)"
 func (e *Expression) AND(exp *Expression) *Expression {
 	if strings.Contains(exp.condition, "OR") {
 		e.condition = fmt.Sprintf("%s AND (%s)", e.condition, exp.condition)
@@ -38,8 +57,25 @@ func (e *Expression) AND(exp *Expression) *Expression {
 	return e
 }
 
-// OR
-// OR条件設定
+// OR sets the condition of the Expression object with the logical OR operator.
+// If the exp.condition contains the string "AND", it appends the condition in brackets with the OR operator.
+// Otherwise, it appends the condition with the OR operator without brackets.
+//
+// It also sets the bracketFlg to true, indicating that the condition contains brackets.
+//
+// Example usage:
+//
+//	exp := &Expression{condition: "name = 'test'"}
+//	newExp := exp.OR(&Expression{condition: "id = 1"})
+//	// Output: newExp.condition = "name = 'test' OR id = 1"
+//
+//	exp := &Expression{condition: "name = 'test'"}
+//	newExp := exp.OR(&Expression{condition: "id = 1 AND id = 2"})
+//	// Output: newExp.condition = "name = 'test' OR (id = 1 AND id = 2)"
+//
+//	exp := &Expression{condition: "name = 'test'"}
+//	newExp := exp.OR(&Expression{condition: "id = 1 OR id = 2"})
+//	// Output: newExp.condition = "name = 'test' OR (id = 1 OR id = 2)"
 func (e *Expression) OR(exp *Expression) *Expression {
 	if strings.Contains(exp.condition, "AND") {
 		e.condition = fmt.Sprintf("%s OR (%s)", e.condition, exp.condition)
