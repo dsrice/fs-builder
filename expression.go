@@ -133,6 +133,18 @@ func Like(target string, comp string) *Expression {
 	}
 }
 
+// NLike is a function that creates an Expression with a specific condition based on the target and comparison value.
+// It builds the condition using the fmt.Sprintf function to format the target and comparison value appropriately,
+// excluding any records where the target value is like the comparison value.
+// The function returns a pointer to an Expression struct initialized with the condition.
+func NLike(target string, comp string) *Expression {
+	cond := fmt.Sprintf("%s NOT LIKE '%s'", target, comp)
+
+	return &Expression{
+		condition: cond,
+	}
+}
+
 // AND sets the condition of the Expression object with the logical AND operator.
 // If the exp.condition contains the string "OR", it appends the condition in brackets with the AND operator.
 // Otherwise, it appends the condition with the AND operator without brackets.
