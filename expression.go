@@ -2,6 +2,7 @@ package fsb
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -18,13 +19,7 @@ type Expression struct {
 // The condition is built using the fmt.Sprintf function to format the target and comparison value appropriately.
 // The function returns a pointer to an Expression struct initialized with the condition.
 func Eq(target string, comp interface{}) *Expression {
-	var cond string
-	switch v := comp.(type) {
-	case string:
-		cond = fmt.Sprintf("%s = '%s'", target, v)
-	case int:
-		cond = fmt.Sprintf("%s = %d", target, v)
-	}
+	cond := createCondition(target, comp, "=")
 
 	return &Expression{
 		condition: cond,
@@ -36,17 +31,12 @@ func Eq(target string, comp interface{}) *Expression {
 // The condition is built using the fmt.Sprintf function to format the target and comparison value appropriately with the "!=" operator.
 // The function returns a pointer to an Expression struct initialized with the condition.
 func Neq(target string, comp interface{}) *Expression {
-	var cond string
-	switch v := comp.(type) {
-	case string:
-		cond = fmt.Sprintf("%s != '%s'", target, v)
-	case int:
-		cond = fmt.Sprintf("%s != %d", target, v)
-	}
+	cond := createCondition(target, comp, "!=")
 
 	return &Expression{
 		condition: cond,
 	}
+
 }
 
 // Gt is a function that creates an Expression with a specific condition based on the target and comparison value, where the target is greater than the comparison value.
@@ -54,17 +44,12 @@ func Neq(target string, comp interface{}) *Expression {
 // The condition is built using the fmt.Sprintf function to format the target and comparison value appropriately.
 // The function returns a pointer to an Expression struct initialized with the condition.
 func Gt(target string, comp interface{}) *Expression {
-	var cond string
-	switch v := comp.(type) {
-	case string:
-		cond = fmt.Sprintf("%s > '%s'", target, v)
-	case int:
-		cond = fmt.Sprintf("%s > %d", target, v)
-	}
+	cond := createCondition(target, comp, ">")
 
 	return &Expression{
 		condition: cond,
 	}
+
 }
 
 // Gte is a function that creates an Expression with a specific condition based on the target and comparison value.
@@ -73,17 +58,12 @@ func Gt(target string, comp interface{}) *Expression {
 // with ">=" as the comparison operator.
 // The function returns a pointer to an Expression struct initialized with the condition.
 func Gte(target string, comp interface{}) *Expression {
-	var cond string
-	switch v := comp.(type) {
-	case string:
-		cond = fmt.Sprintf("%s >= '%s'", target, v)
-	case int:
-		cond = fmt.Sprintf("%s >= %d", target, v)
-	}
+	cond := createCondition(target, comp, ">=")
 
 	return &Expression{
 		condition: cond,
 	}
+
 }
 
 // Lt is a function that creates an Expression with a specific condition based on the target and comparison value.
@@ -91,13 +71,7 @@ func Gte(target string, comp interface{}) *Expression {
 // The condition is built using the fmt.Sprintf function to format the target and comparison value appropriately, with a less than (<) symbol.
 // The function returns a pointer to an Expression struct initialized with the condition.
 func Lt(target string, comp interface{}) *Expression {
-	var cond string
-	switch v := comp.(type) {
-	case string:
-		cond = fmt.Sprintf("%s < '%s'", target, v)
-	case int:
-		cond = fmt.Sprintf("%s < %d", target, v)
-	}
+	cond := createCondition(target, comp, "<")
 
 	return &Expression{
 		condition: cond,
@@ -105,43 +79,85 @@ func Lt(target string, comp interface{}) *Expression {
 }
 
 // Lte is a function that creates an Expression with a specific condition based on the target and comparison value.
-// It can handle string and int comparison values and creates a "less than or equal to" condition using the fmt.Sprintf function.
+// It can handle string and int comparison values.
+// The condition is built using the fmt.Sprintf function to format the target and comparison value appropriately.
 // The function returns a pointer to an Expression struct initialized with the condition.
 func Lte(target string, comp interface{}) *Expression {
-	var cond string
-	switch v := comp.(type) {
-	case string:
-		cond = fmt.Sprintf("%s <= '%s'", target, v)
-	case int:
-		cond = fmt.Sprintf("%s <= %d", target, v)
-	}
+	cond := createCondition(target, comp, "<=")
 
 	return &Expression{
 		condition: cond,
 	}
 }
 
-// Like is a function that creates an Expression with a condition that performs a LIKE comparison.
-// It takes a target string and a comp string as input.
-// The condition is built using the fmt.Sprintf function to format the target and comp values appropriately.
+// Like is a function that creates an Expression with a specific condition based on the target and comparison value using the "LIKE" operator.
+// It handles only string comparison values.
+// The condition is built using the fmt.Sprintf function to format the target and comparison value appropriately.
 // The function returns a pointer to an Expression struct initialized with the condition.
 func Like(target string, comp string) *Expression {
-	cond := fmt.Sprintf("%s LIKE '%s'", target, comp)
+	cond := createCondition(target, comp, "LIKE")
 
 	return &Expression{
 		condition: cond,
 	}
 }
 
-// NLike is a function that creates an Expression with a specific condition based on the target and comparison value.
-// It builds the condition using the fmt.Sprintf function to format the target and comparison value appropriately,
-// excluding any records where the target value is like the comparison value.
-// The function returns a pointer to an Expression struct initialized with the condition.
-func NLike(target string, comp string) *Expression {
-	cond := fmt.Sprintf("%s NOT LIKE '%s'", target, comp)
+// Nlike is a function that creates an Expression struct with a specific condition based on the target and comparison value.
+// It uses the "NOT LIKE" sign to build the condition.
+// The function returns a pointer to the Expression struct initialized with the condition.
+func Nlike(target string, comp string) *Expression {
+	cond := createCondition(target, comp, "NOT LIKE")
 
 	return &Expression{
 		condition: cond,
+	}
+}
+
+// Pm is a function that creates an Expression with a specific condition based on the target and comparison value.
+// It converts the comparison value to a SQL-like pattern using the toSqlLikePattern function.
+// The condition is built using the createCondition function with the target, converted comparison value, and "LIKE" sign.
+// The function returns a pointer to an Expression struct initialized with the condition.
+func Pm(target string, comp interface{}) *Expression {
+	cond := createCondition(target, toSqlLikePattern(comp), "LIKE")
+
+	return &Expression{
+		condition: cond,
+	}
+}
+
+// createCondition is a function that takes a target string, a comparison value of type string or int, and a sign string.
+// It builds and returns a condition string based on the target, comparison value, and sign provided.
+// If the comparison value is a string, it formats the condition as "%s %s '%s'", where the target, sign, and comparison value are substituted accordingly.
+// If the comparison value is an int, it formats the condition as "%s %s %d", where the target, sign, and comparison value are substituted accordingly.
+// If the comparison value is neither a string nor an int, it returns an empty string.
+// Example usage:
+//
+//	cond := createCondition("age", 25, "=") // Returns "age = 25"
+//	cond := createCondition("name", "John", "=") // Returns "name = 'John'"
+func createCondition(target string, comp interface{}, sign string) string {
+	switch v := comp.(type) {
+	case string:
+		return fmt.Sprintf("%s %s '%s'", target, sign, v)
+	case int:
+		return fmt.Sprintf("%s %s %d", target, sign, v)
+	default:
+		return ""
+	}
+}
+
+// toSqlLikePattern is a function that converts a comparison value to a SQL LIKE pattern.
+// It takes an interface{} as an argument and returns a string.
+// If the comparison value is a string, it appends '%' at the end.
+// If the comparison value is an int, it converts it to a string and appends '%' at the end.
+// For any other type, it returns an empty string.
+func toSqlLikePattern(comp interface{}) string {
+	switch v := comp.(type) {
+	case string:
+		return v + "%"
+	case int:
+		return strconv.Itoa(v) + "%"
+	default:
+		return ""
 	}
 }
 
