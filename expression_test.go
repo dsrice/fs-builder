@@ -244,7 +244,8 @@ func (s *ExpressionSuite) Test_PmString() {
 // It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
 // Lastly, it asserts that the condition field is equal to the expected value.
 // Test_PmInt tests the logic that constructs a LIKE condition with an integer value in the ExpressionSuite.
-// The method creates an Expression object using the Pm function from the fsb package, passing in the target attribute and the integer value.
+// The method creates an Expression object using the Pm function from the fsb package,
+// passing in the target attribute and the integer value.
 // It retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
 // Finally, it asserts that the condition field is equal to the expected value.
 func (s *ExpressionSuite) Test_PmInt() {
@@ -348,6 +349,67 @@ func (s *ExpressionSuite) Test_NsmInt() {
 
 	assert.Equal(s.T(), "test NOT LIKE '%1"+
 		"'", *ps)
+}
+
+// Test_PsmString is a unit test for the PsmString method.
+// It tests the functionality of the PsmString method in the ExpressionSuite type.
+// The PsmString method creates an Expression object using the Psm function from the fsb package.
+// It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
+// Lastly, it asserts that the condition field is equal to the expected value.
+func (s *ExpressionSuite) Test_PsmString() {
+	ex := fsb.Psm("test", "user1")
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test LIKE '%user1%'", *ps)
+}
+
+// Test_PsmInt is a unit test for the PsmInt method.
+// It tests the functionality of the PsmInt method in the ExpressionSuite type.
+// The PsmInt method creates an Expression object using the Psm function from the fsb package.
+// It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
+// Lastly, it asserts that the condition field is equal to the expected value.
+// Example: "test LIKE '%1%'"
+func (s *ExpressionSuite) Test_PsmInt() {
+	ex := fsb.Psm("test", 1)
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test LIKE '%1%'", *ps)
+}
+
+// Test_NpsmString is a unit test for the NpsmString method.
+// It tests the functionality of the NpsmString method in the ExpressionSuite type.
+// The NpsmString method creates an Expression object using the Npsm function from the fsb package.
+// It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
+// Lastly, it asserts that the condition field is equal to the expected value.
+func (s *ExpressionSuite) Test_NpsmString() {
+	ex := fsb.Npsm("test", "user1")
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test NOT LIKE '%user1%'", *ps)
+}
+
+// Test_NpsmInt is a unit test for the NpsmInt method.
+// It tests the functionality of the NpsmInt method in the ExpressionSuite type.
+// The NpsmInt method creates an Expression object using the Npsm function from the fsb package.
+// It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
+// Lastly, it asserts that the condition field is equal to the expected value.
+func (s *ExpressionSuite) Test_NpsmInt() {
+	ex := fsb.Npsm("test", 1)
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test NOT LIKE '%1%'", *ps)
 }
 
 func TestExpressionSuite(t *testing.T) {

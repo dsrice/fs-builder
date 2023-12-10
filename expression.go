@@ -36,10 +36,10 @@ func Neq(target string, comp interface{}) *Expression {
 	return &Expression{
 		condition: cond,
 	}
-
 }
 
-// Gt is a function that creates an Expression with a specific condition based on the target and comparison value, where the target is greater than the comparison value.
+// Gt is a function that creates an Expression with a specific condition based on the target and comparison value,
+// where the target is greater than the comparison value.
 // It can handle string and int comparison values.
 // The condition is built using the fmt.Sprintf function to format the target and comparison value appropriately.
 // The function returns a pointer to an Expression struct initialized with the condition.
@@ -49,7 +49,6 @@ func Gt(target string, comp interface{}) *Expression {
 	return &Expression{
 		condition: cond,
 	}
-
 }
 
 // Gte is a function that creates an Expression with a specific condition based on the target and comparison value.
@@ -63,12 +62,12 @@ func Gte(target string, comp interface{}) *Expression {
 	return &Expression{
 		condition: cond,
 	}
-
 }
 
 // Lt is a function that creates an Expression with a specific condition based on the target and comparison value.
 // It can handle string and int comparison values.
-// The condition is built using the fmt.Sprintf function to format the target and comparison value appropriately, with a less than (<) symbol.
+// The condition is built using the fmt.Sprintf function to format the target and comparison value appropriately,
+// with a less than (<) symbol.
 // The function returns a pointer to an Expression struct initialized with the condition.
 func Lt(target string, comp interface{}) *Expression {
 	cond := createCondition(target, comp, "<")
@@ -90,11 +89,12 @@ func Lte(target string, comp interface{}) *Expression {
 	}
 }
 
-// Like is a function that creates an Expression with a specific condition based on the target and comparison value using the "LIKE" operator.
+// Like is a function that creates an Expression with a specific condition based
+// on the target and comparison value using the "LIKE" operator.
 // It handles only string comparison values.
 // The condition is built using the fmt.Sprintf function to format the target and comparison value appropriately.
 // The function returns a pointer to an Expression struct initialized with the condition.
-func Like(target string, comp string) *Expression {
+func Like(target, comp string) *Expression {
 	cond := createCondition(target, comp, "LIKE")
 
 	return &Expression{
@@ -102,10 +102,11 @@ func Like(target string, comp string) *Expression {
 	}
 }
 
-// Nlike is a function that creates an Expression struct with a specific condition based on the target and comparison value.
+// Nlike is a function that creates an Expression struct with a specific condition based
+// on the target and comparison value.
 // It uses the "NOT LIKE" sign to build the condition.
 // The function returns a pointer to the Expression struct initialized with the condition.
-func Nlike(target string, comp string) *Expression {
+func Nlike(target, comp string) *Expression {
 	cond := createCondition(target, comp, "NOT LIKE")
 
 	return &Expression{
@@ -115,11 +116,12 @@ func Nlike(target string, comp string) *Expression {
 
 // Pm is a function that creates an Expression with a condition using the "LIKE" operator.
 // It takes a target string and a comparison value as arguments.
-// The comparison value is converted to a SQL like prefix pattern using the toSqlLikePrefixPattern function.
-// The createCondition function is used to create the condition string with the target, converted comparison value, and "LIKE" operator.
+// The comparison value is converted to a SQL like prefix pattern using the sqlLikePrefixPattern function.
+// The createCondition function is used to create the condition string with the target,
+// converted comparison value, and "LIKE" operator.
 // The function returns a pointer to an Expression struct initialized with the condition.
 func Pm(target string, comp interface{}) *Expression {
-	cond := createCondition(target, toSqlLikePrefixPattern(comp), "LIKE")
+	cond := createCondition(target, sqlLikePrefixPattern(comp), "LIKE")
 
 	return &Expression{
 		condition: cond,
@@ -127,10 +129,11 @@ func Pm(target string, comp interface{}) *Expression {
 }
 
 // Npm is a function that creates an Expression with a specific condition based on the target and comparison value.
-// It uses the createCondition function to build the condition using the target, the comparison value converted into a SQL like prefix pattern, and the "NOT LIKE" sign.
+// It uses the createCondition function to build the condition using the target,
+// the comparison value converted into a SQL like prefix pattern, and the "NOT LIKE" sign.
 // The function returns a pointer to an Expression struct initialized with the condition.
 func Npm(target string, comp interface{}) *Expression {
-	cond := createCondition(target, toSqlLikePrefixPattern(comp), "NOT LIKE")
+	cond := createCondition(target, sqlLikePrefixPattern(comp), "NOT LIKE")
 
 	return &Expression{
 		condition: cond,
@@ -138,37 +141,64 @@ func Npm(target string, comp interface{}) *Expression {
 }
 
 // Sm is a function that creates an Expression with a specific condition based on the target and comparison value.
-// It uses the createCondition function to build the condition string using the target, a modified comparison value obtained from the toSqlLikeSuffixPattern function, and the "LIKE"
+// It uses the createCondition function to build the condition string using the target,
+// a modified comparison value obtained from the sqlLikeSuffixPattern function, and the "LIKE"
 func Sm(target string, comp interface{}) *Expression {
-	cond := createCondition(target, toSqlLikeSuffixPattern(comp), "LIKE")
+	cond := createCondition(target, sqlLikeSuffixPattern(comp), "LIKE")
 
 	return &Expression{
 		condition: cond,
 	}
 }
 
-// Nsm is a function that creates an Expression with a specific "NOT LIKE" condition based on the target and comparison value.
+// Nsm is a function that creates an Expression with a specific "NOT LIKE" condition
+// based on the target and comparison value.
 // It can handle string and int comparison values.
-// The comparison value is converted to a SQL LIKE suffix pattern using the toSqlLikeSuffixPattern function.
-// The condition is built using the createCondition function with the target, SQL LIKE suffix pattern, and "NOT LIKE" sign.
+// The comparison value is converted to a SQL LIKE suffix pattern using the sqlLikeSuffixPattern function.
+// The condition is built using the createCondition function with the target,
+// SQL LIKE suffix pattern, and "NOT LIKE" sign.
 // The function returns a pointer to an Expression struct initialized with the condition.
 func Nsm(target string, comp interface{}) *Expression {
-	cond := createCondition(target, toSqlLikeSuffixPattern(comp), "NOT LIKE")
+	cond := createCondition(target, sqlLikeSuffixPattern(comp), "NOT LIKE")
 
 	return &Expression{
 		condition: cond,
 	}
 }
 
-// createCondition is a function that takes a target string, a comparison value of type string or int, and a sign string.
-// It builds and returns a condition string based on the target, comparison value, and sign provided.
-// If the comparison value is a string, it formats the condition as "%s %s '%s'", where the target, sign, and comparison value are substituted accordingly.
-// If the comparison value is an int, it formats the condition as "%s %s %d", where the target, sign, and comparison value are substituted accordingly.
-// If the comparison value is neither a string nor an int, it returns an empty string.
-// Example usage:
-//
-//	cond := createCondition("age", 25, "=") // Returns "age = 25"
-//	cond := createCondition("name", "John", "=") // Returns "name = 'John'"
+// Psm is a function that creates an Expression with a condition using the LIKE operator.
+// It takes a target string and a comp interface{} as arguments.
+// The function first converts the comp value into a SQL pattern with a prefix
+// and suffix using the sqlLikePrefixPattern and sqlLikeSuffixPattern functions.
+// Then, it calls the createCondition function to create the condition string using the target,
+// the SQL pattern, and the "LIKE" sign.
+// The function returns a pointer to an Expression struct initialized with the condition.
+func Psm(target string, comp interface{}) *Expression {
+	cond := createCondition(target, sqlLikePrefixPattern(sqlLikeSuffixPattern(comp)), "LIKE")
+
+	return &Expression{
+		condition: cond,
+	}
+}
+
+// Npsm is a function that creates an Expression with a specific condition based on the target and comparison value.
+// It can handle string and int comparison values.
+// The comp value is converted to a SQL LIKE pattern with a prefix
+// and suffix using the sqlLikePrefixPattern and sqlLikeSuffixPattern functions.
+// The condition is built using the createCondition function with the target, converted comp value, and "NOT LIKE" sign.
+// The function returns a pointer to an Expression struct initialized with the condition.
+func Npsm(target string, comp interface{}) *Expression {
+	cond := createCondition(target, sqlLikePrefixPattern(sqlLikeSuffixPattern(comp)), "NOT LIKE")
+
+	return &Expression{
+		condition: cond,
+	}
+}
+
+// createCondition is a function that takes a target string, comparison value, and sign string
+// and returns a string representing the condition for the expression.
+// It supports string and int comparison values and formats the condition using fmt.Sprintf.
+// The returned condition string includes the target, sign, and comparison value appropriately formatted.
 func createCondition(target string, comp interface{}, sign string) string {
 	switch v := comp.(type) {
 	case string:
@@ -185,7 +215,7 @@ func createCondition(target string, comp interface{}, sign string) string {
 // If the comparison value is a string, it appends '%' at the end.
 // If the comparison value is an int, it converts it to a string and appends '%' at the end.
 // For any other type, it returns an empty string.
-func toSqlLikePrefixPattern(comp interface{}) string {
+func sqlLikePrefixPattern(comp interface{}) string {
 	switch v := comp.(type) {
 	case string:
 		return v + "%"
@@ -196,14 +226,17 @@ func toSqlLikePrefixPattern(comp interface{}) string {
 	}
 }
 
-// toSqlLikeSuffixPattern is a function that takes a comparison value as input and returns a string representation of a SQL "LIKE" pattern with a suffix wildcard.
+// sqlLikeSuffixPattern is a function that takes a comparison value as input
+// and returns a string representation of a SQL "LIKE" pattern with a suffix wildcard.
 // It can handle comparison values of type string and int.
 // If the comparison value is a string, the function prepends a "%" character to it.
-// If the comparison value is an int, the function converts it to a string using strconv.Itoa and prepends a "%" character to it.
+// If the comparison value is an int,
+// the function converts it to a string using strconv.Itoa and prepends a "%" character to it.
 // If the comparison value is of any other type, the function returns an empty string.
-// The function is primarily used in conjunction with the createCondition function to generate a SQL WHERE clause condition for a "LIKE" comparison.
-// Example usages of toSqlLikeSuffixPattern can be seen in the Sm and Nsm functions.
-func toSqlLikeSuffixPattern(comp interface{}) string {
+// The function is primarily used in conjunction with the createCondition function to generate a SQL
+// WHERE clause condition for a "LIKE" comparison.
+// Example usages of sqlLikeSuffixPattern can be seen in the Sm and Nsm functions.
+func sqlLikeSuffixPattern(comp interface{}) string {
 	switch v := comp.(type) {
 	case string:
 		return "%" + v
