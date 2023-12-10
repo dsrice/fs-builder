@@ -233,6 +233,48 @@ func Nbetween(target string, start, end interface{}) *Expression {
 	}
 }
 
+// In is a function that creates an Expression with a specific condition based on the target and list of values.
+// The target is a string specifying the column name to compare against.
+// The list is a variadic parameter that accepts multiple values to be compared against the target.
+// The values in the list can be of type string, []string, int, or []int.
+// If the values in the list are of type string or []string, they will be enclosed in single quotes in the condition.
+// If the values in the list are of type int or []int, they will be treated as numeric values in the condition.
+// The function iterates over the list and appends the converted values to a results slice.
+// It then uses the fmt.Sprintf function to format the target and the results slice into the condition string.
+// The function returns a pointer to an Expression struct initialized with the condition.
+func In(target string, list ...interface{}) *Expression {
+	var cond string
+	print(list)
+	var results []string
+	sFlg := false
+	for _, l := range list {
+		switch v := l.(type) {
+		case string:
+			results = append(results, v)
+			sFlg = true
+		case []string:
+			results = append(results, v...)
+			sFlg = true
+		case int:
+			results = append(results, strconv.Itoa(v))
+		case []int:
+			for _, i := range v {
+				results = append(results, strconv.Itoa(i))
+			}
+		}
+	}
+
+	if sFlg {
+		cond = fmt.Sprintf("%s IN ('%s')", target, strings.Join(results, "', '"))
+	} else {
+		cond = fmt.Sprintf("%s IN (%s)", target, strings.Join(results, ", "))
+	}
+
+	return &Expression{
+		condition: cond,
+	}
+}
+
 // createCondition is a function that takes a target string, comparison value, and sign string
 // and returns a string representing the condition for the expression.
 // It supports string and int comparison values and formats the condition using fmt.Sprintf.

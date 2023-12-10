@@ -472,6 +472,126 @@ func (s *ExpressionSuite) Test_NbetweenInt() {
 	assert.Equal(s.T(), "test NOT BETWEEN 1 TO 5", *ps)
 }
 
+// Test_InString is a unit test for the InString method.
+// It tests the functionality of the InString method in the ExpressionSuite type.
+// The InString method creates an Expression object using the In function from the fsb package.
+// It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
+// Lastly, it asserts that the condition field is equal to the expected value.
+func (s *ExpressionSuite) Test_InString() {
+	ex := fsb.In("test", "user1")
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test IN ('user1')", *ps)
+}
+
+// Test_InStringMulti is a unit test for the InStringMulti method.
+// It tests the functionality of the InStringMulti method in the ExpressionSuite type.
+// The InStringMulti method creates an Expression object using the In function from the fsb package.
+// It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
+// Lastly, it asserts that the condition field is equal to the expected value.
+func (s *ExpressionSuite) Test_InStringMulti() {
+	ex := fsb.In("test", "user1", "user2")
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test IN ('user1', 'user2')", *ps)
+}
+
+// Test_InStringSlice is a unit test for the InStringSlice method.
+// It tests the functionality of the InStringSlice method in the ExpressionSuite type.
+// The InStringSlice method creates an Expression object using the In function from the fsb package.
+// It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
+// Lastly, it asserts that the condition field is equal to the expected value.
+func (s *ExpressionSuite) Test_InStringSlice() {
+	ex := fsb.In("test", []string{"user1", "user2"})
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test IN ('user1', 'user2')", *ps)
+}
+
+// Test_InStringSliceMulti is a unit test for the InStringSliceMulti method.
+// It tests the functionality of the InStringSliceMulti method in the ExpressionSuite type.
+// The InStringSliceMulti method creates an Expression object using the In function from the fsb package.
+// It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
+// Lastly, it asserts that the condition field is equal to the expected value.
+func (s *ExpressionSuite) Test_InStringSliceMulti() {
+	ex := fsb.In("test", []string{"user1", "user2"}, "user3")
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test IN ('user1', 'user2', 'user3')", *ps)
+}
+
+// Test_InInt is a unit test for the InInt method.
+// It tests the functionality of the InInt method in the ExpressionSuite type.
+// The InInt method creates an Expression object using the In function from the fsb package.
+// It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
+// Lastly, it asserts that the condition field is equal to the expected value.
+func (s *ExpressionSuite) Test_InInt() {
+	ex := fsb.In("test", 1)
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test IN (1)", *ps)
+}
+
+// Test_InIntMulti is a unit test for the InIntMulti method.
+// It tests the functionality of the InIntMulti method in the ExpressionSuite type.
+// The InIntMulti method creates an Expression object using the In function from the fsb package.
+// It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
+// Lastly, it asserts that the condition field is equal to the expected value.
+func (s *ExpressionSuite) Test_InIntMulti() {
+	ex := fsb.In("test", 1, 3)
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test IN (1, 3)", *ps)
+}
+
+// Test_InIntSlice is a unit test for the InIntSlice method.
+// It tests the functionality of the InIntSlice method in the ExpressionSuite type.
+// The InIntSlice method creates an Expression object using the In function from the fsb package.
+// It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
+// Lastly, it asserts that the condition field is equal to the expected value.
+func (s *ExpressionSuite) Test_InIntSlice() {
+	ex := fsb.In("test", []int{1, 5})
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test IN (1, 5)", *ps)
+}
+
+// Test_InIntSliceMutli is a unit test for the InIntSliceMutli method.
+// It tests the functionality of the InIntSliceMutli method in the ExpressionSuite type.
+// The InIntSliceMutli method creates an Expression object using the In function from the fsb package.
+// It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
+// Lastly, it asserts that the condition field is equal to the expected value.
+func (s *ExpressionSuite) Test_InIntSliceMutli() {
+	ex := fsb.In("test", []int{1, 5}, 3)
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test IN (1, 5, 3)", *ps)
+}
+
 func TestExpressionSuite(t *testing.T) {
 	suite.Run(t, new(ExpressionSuite))
 }
