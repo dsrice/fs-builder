@@ -196,6 +196,13 @@ func toSqlLikePrefixPattern(comp interface{}) string {
 	}
 }
 
+// toSqlLikeSuffixPattern is a function that takes a comparison value as input and returns a string representation of a SQL "LIKE" pattern with a suffix wildcard.
+// It can handle comparison values of type string and int.
+// If the comparison value is a string, the function prepends a "%" character to it.
+// If the comparison value is an int, the function converts it to a string using strconv.Itoa and prepends a "%" character to it.
+// If the comparison value is of any other type, the function returns an empty string.
+// The function is primarily used in conjunction with the createCondition function to generate a SQL WHERE clause condition for a "LIKE" comparison.
+// Example usages of toSqlLikeSuffixPattern can be seen in the Sm and Nsm functions.
 func toSqlLikeSuffixPattern(comp interface{}) string {
 	switch v := comp.(type) {
 	case string:
