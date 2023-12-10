@@ -253,6 +253,36 @@ func (s *ExpressionSuite) Test_PmInt() {
 	assert.Equal(s.T(), "test LIKE '1%'", *ps)
 }
 
+// Test_NpmString is a unit test for the NpmString method.
+// It tests the functionality of the NpmString method in the ExpressionSuite type.
+// The NpmString method creates an Expression object using the Npm function from the fsb package.
+// It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
+// Lastly, it asserts that the condition field is equal to the expected value.
+func (s *ExpressionSuite) Test_NpmString() {
+	ex := fsb.Npm("test", "user1")
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test NOT LIKE 'user1%'", *ps)
+}
+
+// Test_NpmInt is a unit test for the NpmInt method.
+// It tests the functionality of the NpmInt method in the ExpressionSuite type.
+// The NpmInt method creates an Expression object using the Npm function from the fsb package.
+// It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
+// Lastly, it asserts that the condition field is equal to the expected value.
+func (s *ExpressionSuite) Test_NpmInt() {
+	ex := fsb.Npm("test", 1)
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test NOT LIKE '1%'", *ps)
+}
+
 func TestExpressionSuite(t *testing.T) {
 	suite.Run(t, new(ExpressionSuite))
 }

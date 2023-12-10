@@ -125,6 +125,18 @@ func Pm(target string, comp interface{}) *Expression {
 	}
 }
 
+// Npm is a function that creates an Expression with a specific condition based on the target and comparison value.
+// It converts the comparison value to a SQL LIKE pattern using the toSqlLikePattern function.
+// The condition is built using the createCondition function with the target, SQL LIKE pattern, and "NOT LIKE" sign.
+// The function returns a pointer to an Expression struct initialized with the condition.
+func Npm(target string, comp interface{}) *Expression {
+	cond := createCondition(target, toSqlLikePattern(comp), "NOT LIKE")
+
+	return &Expression{
+		condition: cond,
+	}
+}
+
 // createCondition is a function that takes a target string, a comparison value of type string or int, and a sign string.
 // It builds and returns a condition string based on the target, comparison value, and sign provided.
 // If the comparison value is a string, it formats the condition as "%s %s '%s'", where the target, sign, and comparison value are substituted accordingly.
