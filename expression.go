@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// Expression
 // AND combines the current expression with another expression using the AND operator.
 // If the other expression contains the OR operator, the current expression will be enclosed in brackets.
 type Expression struct {
@@ -23,6 +24,24 @@ func Eq(target string, comp interface{}) *Expression {
 		cond = fmt.Sprintf("%s = '%s'", target, v)
 	case int:
 		cond = fmt.Sprintf("%s = %d", target, v)
+	}
+
+	return &Expression{
+		condition: cond,
+	}
+}
+
+// Neq is a function that creates an Expression with a specific condition based on the target and comparison value.
+// It can handle string and int comparison values.
+// The condition is built using the fmt.Sprintf function to format the target and comparison value appropriately with the "!=" operator.
+// The function returns a pointer to an Expression struct initialized with the condition.
+func Neq(target string, comp interface{}) *Expression {
+	var cond string
+	switch v := comp.(type) {
+	case string:
+		cond = fmt.Sprintf("%s != '%s'", target, v)
+	case int:
+		cond = fmt.Sprintf("%s != %d", target, v)
 	}
 
 	return &Expression{
