@@ -83,7 +83,6 @@ linters:
     - dupl
     - errcheck
     - funlen
-    - gocheckcompilerdirectives
     - gochecknoinits
     - goconst
     - gocritic
@@ -97,7 +96,6 @@ linters:
     - lll
     - misspell
     - nakedret
-    - noctx
     - nolintlint
     - revive
     - staticcheck
