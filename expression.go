@@ -86,6 +86,24 @@ func Gte(target string, comp interface{}) *Expression {
 	}
 }
 
+// Lt is a function that creates an Expression with a specific condition based on the target and comparison value.
+// It can handle string and int comparison values.
+// The condition is built using the fmt.Sprintf function to format the target and comparison value appropriately, with a less than (<) symbol.
+// The function returns a pointer to an Expression struct initialized with the condition.
+func Lt(target string, comp interface{}) *Expression {
+	var cond string
+	switch v := comp.(type) {
+	case string:
+		cond = fmt.Sprintf("%s < '%s'", target, v)
+	case int:
+		cond = fmt.Sprintf("%s < %d", target, v)
+	}
+
+	return &Expression{
+		condition: cond,
+	}
+}
+
 // AND sets the condition of the Expression object with the logical AND operator.
 // If the exp.condition contains the string "OR", it appends the condition in brackets with the AND operator.
 // Otherwise, it appends the condition with the AND operator without brackets.
