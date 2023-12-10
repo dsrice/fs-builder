@@ -113,32 +113,47 @@ func Nlike(target string, comp string) *Expression {
 	}
 }
 
-// Sm is a function that creates an Expression with a specific condition based on the target and comparison value.
-// It converts the comparison value to a SQL-like pattern using the toSqlLikePattern function.
-// The condition is built using the createCondition function with the target, converted comparison value, and "LIKE" sign.
+// Pm is a function that creates an Expression with a condition using the "LIKE" operator.
+// It takes a target string and a comparison value as arguments.
+// The comparison value is converted to a SQL like prefix pattern using the toSqlLikePrefixPattern function.
+// The createCondition function is used to create the condition string with the target, converted comparison value, and "LIKE" operator.
 // The function returns a pointer to an Expression struct initialized with the condition.
-func Sm(target string, comp interface{}) *Expression {
-	cond := createCondition(target, toSqlLikePattern(comp), "LIKE")
+func Pm(target string, comp interface{}) *Expression {
+	cond := createCondition(target, toSqlLikePrefixPattern(comp), "LIKE")
 
 	return &Expression{
 		condition: cond,
 	}
 }
 
-// Nsm is a function that creates an Expression with a specific condition based on the target and comparison value.
-// It converts the comparison value to a SQL LIKE pattern using the toSqlLikePattern function.
-// The condition is built using the createCondition function with the target, SQL LIKE pattern, and "NOT LIKE" sign.
+// Npm is a function that creates an Expression with a specific condition based on the target and comparison value.
+// It uses the createCondition function to build the condition using the target, the comparison value converted into a SQL like prefix pattern, and the "NOT LIKE" sign.
+// The function returns a pointer to an Expression struct initialized with the condition.
+func Npm(target string, comp interface{}) *Expression {
+	cond := createCondition(target, toSqlLikePrefixPattern(comp), "NOT LIKE")
+
+	return &Expression{
+		condition: cond,
+	}
+}
+
+// Sm is a function that creates an Expression with a specific condition based on the target and comparison value.
+// It uses the createCondition function to build the condition string using the target, a modified comparison value obtained from the toSqlLikeSuffixPattern function, and the "LIKE"
+func Sm(target string, comp interface{}) *Expression {
+	cond := createCondition(target, toSqlLikeSuffixPattern(comp), "LIKE")
+
+	return &Expression{
+		condition: cond,
+	}
+}
+
+// Nsm is a function that creates an Expression with a specific "NOT LIKE" condition based on the target and comparison value.
+// It can handle string and int comparison values.
+// The comparison value is converted to a SQL LIKE suffix pattern using the toSqlLikeSuffixPattern function.
+// The condition is built using the createCondition function with the target, SQL LIKE suffix pattern, and "NOT LIKE" sign.
 // The function returns a pointer to an Expression struct initialized with the condition.
 func Nsm(target string, comp interface{}) *Expression {
-	cond := createCondition(target, toSqlLikePattern(comp), "NOT LIKE")
-
-	return &Expression{
-		condition: cond,
-	}
-}
-
-func Bm(target string, comp interface{}) *Expression {
-	cond := createCondition(target, toSqlLikePattern(comp), "LIKE")
+	cond := createCondition(target, toSqlLikeSuffixPattern(comp), "NOT LIKE")
 
 	return &Expression{
 		condition: cond,
@@ -170,12 +185,23 @@ func createCondition(target string, comp interface{}, sign string) string {
 // If the comparison value is a string, it appends '%' at the end.
 // If the comparison value is an int, it converts it to a string and appends '%' at the end.
 // For any other type, it returns an empty string.
-func toSqlLikePattern(comp interface{}) string {
+func toSqlLikePrefixPattern(comp interface{}) string {
 	switch v := comp.(type) {
 	case string:
 		return v + "%"
 	case int:
 		return strconv.Itoa(v) + "%"
+	default:
+		return ""
+	}
+}
+
+func toSqlLikeSuffixPattern(comp interface{}) string {
+	switch v := comp.(type) {
+	case string:
+		return "%" + v
+	case int:
+		return "%" + strconv.Itoa(v)
 	default:
 		return ""
 	}
