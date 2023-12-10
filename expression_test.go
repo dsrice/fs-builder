@@ -225,11 +225,11 @@ func (s *ExpressionSuite) Test_Nlike() {
 
 // Test_PmString is a unit test for the PmString method.
 // It tests the functionality of the PmString method in the ExpressionSuite type.
-// The PmString method creates an Expression object using the Pm function from the fsb package.
+// The PmString method creates an Expression object using the Sm function from the fsb package.
 // It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
 // Lastly, it asserts that the condition field is equal to the expected value.
-func (s *ExpressionSuite) Test_PmString() {
-	ex := fsb.Pm("test", "user1")
+func (s *ExpressionSuite) Test_SmString() {
+	ex := fsb.Sm("test", "user1")
 
 	v := reflect.ValueOf(ex).Elem()
 	r := v.FieldByName("condition")
@@ -240,11 +240,11 @@ func (s *ExpressionSuite) Test_PmString() {
 
 // Test_PmInt is a unit test for the PmInt method.
 // It tests the functionality of the PmInt method in the ExpressionSuite type.
-// The PmInt method creates an Expression object using the Pm function from the fsb package.
+// The PmInt method creates an Expression object using the Sm function from the fsb package.
 // It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
 // Lastly, it asserts that the condition field is equal to the expected value.
-func (s *ExpressionSuite) Test_PmInt() {
-	ex := fsb.Pm("test", 1)
+func (s *ExpressionSuite) Test_SmInt() {
+	ex := fsb.Sm("test", 1)
 
 	v := reflect.ValueOf(ex).Elem()
 	r := v.FieldByName("condition")
@@ -255,11 +255,11 @@ func (s *ExpressionSuite) Test_PmInt() {
 
 // Test_NpmString is a unit test for the NpmString method.
 // It tests the functionality of the NpmString method in the ExpressionSuite type.
-// The NpmString method creates an Expression object using the Npm function from the fsb package.
+// The NpmString method creates an Expression object using the Nsm function from the fsb package.
 // It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
 // Lastly, it asserts that the condition field is equal to the expected value.
-func (s *ExpressionSuite) Test_NpmString() {
-	ex := fsb.Npm("test", "user1")
+func (s *ExpressionSuite) Test_NsmString() {
+	ex := fsb.Nsm("test", "user1")
 
 	v := reflect.ValueOf(ex).Elem()
 	r := v.FieldByName("condition")
@@ -270,11 +270,11 @@ func (s *ExpressionSuite) Test_NpmString() {
 
 // Test_NpmInt is a unit test for the NpmInt method.
 // It tests the functionality of the NpmInt method in the ExpressionSuite type.
-// The NpmInt method creates an Expression object using the Npm function from the fsb package.
+// The NpmInt method creates an Expression object using the Nsm function from the fsb package.
 // It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
 // Lastly, it asserts that the condition field is equal to the expected value.
-func (s *ExpressionSuite) Test_NpmInt() {
-	ex := fsb.Npm("test", 1)
+func (s *ExpressionSuite) Test_NsmInt() {
+	ex := fsb.Nsm("test", 1)
 
 	v := reflect.ValueOf(ex).Elem()
 	r := v.FieldByName("condition")
