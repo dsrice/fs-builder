@@ -214,6 +214,25 @@ func Between(target string, start, end interface{}) *Expression {
 	}
 }
 
+// Nbetween is a function that creates an Expression
+// with a specific condition based on the target, start, and end values.
+// It can handle string and int comparison values.
+// The condition is built using the fmt.Sprintf function to format the target, start, and end values appropriately.
+// The function returns a pointer to an Expression struct initialized with the condition.
+func Nbetween(target string, start, end interface{}) *Expression {
+	var cond string
+	switch v := start.(type) {
+	case string:
+		cond = fmt.Sprintf("%s NOT BETWEEN '%s' TO '%s'", target, v, end.(string))
+	case int:
+		cond = fmt.Sprintf("%s NOT BETWEEN %d TO %d", target, v, end.(int))
+	}
+
+	return &Expression{
+		condition: cond,
+	}
+}
+
 // createCondition is a function that takes a target string, comparison value, and sign string
 // and returns a string representing the condition for the expression.
 // It supports string and int comparison values and formats the condition using fmt.Sprintf.

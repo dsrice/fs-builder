@@ -442,6 +442,36 @@ func (s *ExpressionSuite) Test_BetweenInt() {
 	assert.Equal(s.T(), "test BETWEEN 1 TO 5", *ps)
 }
 
+// Test_NbetweenString is a unit test for the NbetweenString method.
+// It tests the functionality of the NbetweenString method in the ExpressionSuite type.
+// The NbetweenString method creates an Expression object using the Nbetween function from the fsb package.
+// It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
+// Lastly, it asserts that the condition field is equal to the expected value.
+func (s *ExpressionSuite) Test_NbetweenString() {
+	ex := fsb.Nbetween("test", "user1", "user2")
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test NOT BETWEEN 'user1' TO 'user2'", *ps)
+}
+
+// Test_NbetweenInt is a unit test for the NbetweenInt method.
+// It tests the functionality of the NbetweenInt method in the ExpressionSuite type.
+// The NbetweenInt method creates an Expression object using the Nbetween function from the fsb package.
+// It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
+// Lastly, it asserts that the condition field is equal to the expected value.
+func (s *ExpressionSuite) Test_NbetweenInt() {
+	ex := fsb.Nbetween("test", 1, 5)
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test NOT BETWEEN 1 TO 5", *ps)
+}
+
 func TestExpressionSuite(t *testing.T) {
 	suite.Run(t, new(ExpressionSuite))
 }
