@@ -121,6 +121,18 @@ func Lte(target string, comp interface{}) *Expression {
 	}
 }
 
+// Like is a function that creates an Expression with a condition that performs a LIKE comparison.
+// It takes a target string and a comp string as input.
+// The condition is built using the fmt.Sprintf function to format the target and comp values appropriately.
+// The function returns a pointer to an Expression struct initialized with the condition.
+func Like(target string, comp string) *Expression {
+	cond := fmt.Sprintf("%s LIKE '%s'", target, comp)
+
+	return &Expression{
+		condition: cond,
+	}
+}
+
 // AND sets the condition of the Expression object with the logical AND operator.
 // If the exp.condition contains the string "OR", it appends the condition in brackets with the AND operator.
 // Otherwise, it appends the condition with the AND operator without brackets.
