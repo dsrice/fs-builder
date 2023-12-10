@@ -244,12 +244,14 @@ func Nbetween(target string, start, end interface{}) *Expression {
 // The function returns a pointer to an Expression struct initialized with the condition.
 func In(target string, list ...interface{}) *Expression {
 	var cond string
-	print(list)
 	var results []string
+
 	sFlg := false
+
 	for _, l := range list {
 		switch v := l.(type) {
 		case string:
+			println("string")
 			results = append(results, v)
 			sFlg = true
 		case []string:
@@ -261,6 +263,8 @@ func In(target string, list ...interface{}) *Expression {
 			for _, i := range v {
 				results = append(results, strconv.Itoa(i))
 			}
+		default:
+			println(v)
 		}
 	}
 
@@ -268,6 +272,43 @@ func In(target string, list ...interface{}) *Expression {
 		cond = fmt.Sprintf("%s IN ('%s')", target, strings.Join(results, "', '"))
 	} else {
 		cond = fmt.Sprintf("%s IN (%s)", target, strings.Join(results, ", "))
+	}
+
+	return &Expression{
+		condition: cond,
+	}
+}
+
+func Nin(target string, list ...interface{}) *Expression {
+	var cond string
+	var results []string
+
+	sFlg := false
+
+	for _, l := range list {
+		switch v := l.(type) {
+		case string:
+			println("string")
+			results = append(results, v)
+			sFlg = true
+		case []string:
+			results = append(results, v...)
+			sFlg = true
+		case int:
+			results = append(results, strconv.Itoa(v))
+		case []int:
+			for _, i := range v {
+				results = append(results, strconv.Itoa(i))
+			}
+		default:
+			println(v)
+		}
+	}
+
+	if sFlg {
+		cond = fmt.Sprintf("%s NOT IN ('%s')", target, strings.Join(results, "', '"))
+	} else {
+		cond = fmt.Sprintf("%s NOT IN (%s)", target, strings.Join(results, ", "))
 	}
 
 	return &Expression{

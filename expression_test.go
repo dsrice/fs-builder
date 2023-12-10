@@ -582,7 +582,7 @@ func (s *ExpressionSuite) Test_InIntSlice() {
 // The InIntSliceMutli method creates an Expression object using the In function from the fsb package.
 // It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
 // Lastly, it asserts that the condition field is equal to the expected value.
-func (s *ExpressionSuite) Test_InIntSliceMutli() {
+func (s *ExpressionSuite) Test_InIntSliceMulti() {
 	ex := fsb.In("test", []int{1, 5}, 3)
 
 	v := reflect.ValueOf(ex).Elem()
@@ -590,6 +590,122 @@ func (s *ExpressionSuite) Test_InIntSliceMutli() {
 	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
 
 	assert.Equal(s.T(), "test IN (1, 5, 3)", *ps)
+}
+
+// Test_NinString is a unit test for the NinString method.
+// It tests the functionality of the NinString method in the ExpressionSuite type.
+//
+// The NinString method creates an Expression object using the Nin function from the fsb package.
+// It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
+// Lastly, it asserts that the condition field is equal to the expected value.
+func (s *ExpressionSuite) Test_NinString() {
+	ex := fsb.Nin("test", "user1")
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test NOT IN ('user1')", *ps)
+}
+
+// Test_NinStringMulti is a unit test for the NinStringMulti method.
+// It tests the functionality of the NinStringMulti method in the ExpressionSuite type.
+// The NinStringMulti method creates an Expression object using the Nin function from the fsb package.
+// It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
+// Lastly, it asserts that the condition field is equal to the expected value.
+func (s *ExpressionSuite) Test_NinStringMulti() {
+	ex := fsb.Nin("test", "user1", "user2")
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test NOT IN ('user1', 'user2')", *ps)
+}
+
+// Test_NinStringSlice is a unit test for the NinStringSlice method.
+// It tests the functionality of the NinStringSlice method in the ExpressionSuite type.
+// The NinStringSlice method creates an Expression object using the Nin function from the fsb package.
+// It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
+// Lastly, it asserts that the condition field is equal to the expected value.
+func (s *ExpressionSuite) Test_NinStringSlice() {
+	ex := fsb.Nin("test", []string{"user1", "user2"})
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test NOT IN ('user1', 'user2')", *ps)
+}
+
+// Test_NinStringSliceMulti is a unit test for the NinStringSliceMulti method.
+// It tests the functionality of the NinStringSliceMulti method in the ExpressionSuite type.
+// The NinStringSliceMulti method creates an Expression object using the Nin function from the fsb package.
+// It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
+// Lastly, it asserts that the condition field is equal to the expected value.
+func (s *ExpressionSuite) Test_NinStringSliceMulti() {
+	ex := fsb.Nin("test", []string{"user1", "user2"}, "user3")
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test NOT IN ('user1', 'user2', 'user3')", *ps)
+}
+
+// Test_NinInt is a unit test for the NinInt method.
+// It tests the functionality of the NinInt method in the ExpressionSuite type.
+// The NinInt method creates an Expression object using the Nin function from the fsb package.
+// It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
+// Lastly, it asserts that the condition field is equal to the expected value.
+func (s *ExpressionSuite) Test_NinInt() {
+	ex := fsb.Nin("test", 1)
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test NOT IN (1)", *ps)
+}
+
+// Test_NinIntMulti is a unit test for the NinIntMulti method.
+// It tests the functionality of the NinIntMulti method in the ExpressionSuite type.
+// The NinIntMulti method creates an Expression object using the Nin function from the fsb package.
+// It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
+// Lastly, it asserts that the condition field is equal to the expected value.
+func (s *ExpressionSuite) Test_NinIntMulti() {
+	ex := fsb.Nin("test", 1, 3)
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test NOT IN (1, 3)", *ps)
+}
+
+func (s *ExpressionSuite) Test_NinIntSlice() {
+	ex := fsb.Nin("test", []int{1, 5})
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test NOT IN (1, 5)", *ps)
+}
+
+// Test_NinIntSliceMulti is a unit test for the NinIntSliceMulti method.
+// It tests the functionality of the NinIntSliceMulti method in the ExpressionSuite type.
+// The NinIntSliceMulti method creates an Expression object using the Nin function from the fsb package.
+// It then retrieves the condition field of the Expression object using reflection and unsafe pointer conversion.
+// Lastly, it asserts that the condition field is equal to the expected value.
+func (s *ExpressionSuite) Test_NinIntSliceMulti() {
+	ex := fsb.Nin("test", []int{1, 5}, 3)
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test NOT IN (1, 5, 3)", *ps)
 }
 
 func TestExpressionSuite(t *testing.T) {
