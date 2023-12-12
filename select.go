@@ -126,7 +126,7 @@ func (s *SelectContainer) RightJoin(table *TableContainer, conditions ...*Expres
 
 func (s *SelectContainer) FullJoin(table *TableContainer, conditions ...*Expression) *SelectContainer {
 	join := JoinContainer{
-		joinType:   right,
+		joinType:   full,
 		table:      table,
 		conditions: conditions,
 	}
@@ -137,7 +137,7 @@ func (s *SelectContainer) FullJoin(table *TableContainer, conditions ...*Express
 
 func (s *SelectContainer) CrossJoin(table *TableContainer) *SelectContainer {
 	join := JoinContainer{
-		joinType: right,
+		joinType: cross,
 		table:    table,
 	}
 
@@ -182,7 +182,7 @@ func (s *SelectContainer) ToSQL() (string, error) {
 			case right:
 				joinTypeStr = "RIGHT JOIN"
 			case full:
-				joinTypeStr = "CROSS JOIN"
+				joinTypeStr = "FULL JOIN"
 			case cross:
 				joinTypeStr = "CROSS JOIN"
 			}

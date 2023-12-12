@@ -253,6 +253,106 @@ func (s *SelectSuite) Test_SelectString_LeftJoinTable() {
 	assert.Nil(s.T(), err)
 }
 
+func (s *SelectSuite) Test_SelectString_RightJoin() {
+	sb := fsb.Select().
+		From(fsb.Table("users")).
+		RightJoin(fsb.Table("tokens"), fsb.Eq("users.id", "1"))
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(
+		s.T(),
+		"SELECT * FROM users RIGHT JOIN tokens ON users.id = '1';",
+		sql,
+	)
+	assert.Nil(s.T(), err)
+}
+
+func (s *SelectSuite) Test_SelectString_RightJoinCol() {
+	token := fsb.Table("tokens")
+
+	sb := fsb.Select().
+		From(fsb.Table("users")).
+		RightJoin(token, fsb.Eq("users.id", token.Col("user_id")))
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(
+		s.T(),
+		"SELECT * FROM users RIGHT JOIN tokens ON users.id = tokens.user_id;",
+		sql,
+	)
+	assert.Nil(s.T(), err)
+}
+
+func (s *SelectSuite) Test_SelectString_RightJoinTable() {
+	user := fsb.Table("users").As("u")
+	token := fsb.Table("tokens").As("t")
+
+	sb := fsb.Select(user.Col("id")).
+		From(user).
+		RightJoin(token, fsb.Eq(user.Col("id"), token.Col("user_id")))
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(
+		s.T(),
+		"SELECT u.id FROM users AS u RIGHT JOIN tokens AS t ON u.id = t.user_id;",
+		sql,
+	)
+	assert.Nil(s.T(), err)
+}
+
+func (s *SelectSuite) Test_SelectString_FullJoin() {
+	sb := fsb.Select().
+		From(fsb.Table("users")).
+		FullJoin(fsb.Table("tokens"), fsb.Eq("users.id", "1"))
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(
+		s.T(),
+		"SELECT * FROM users FULL JOIN tokens ON users.id = '1';",
+		sql,
+	)
+	assert.Nil(s.T(), err)
+}
+
+func (s *SelectSuite) Test_SelectString_FullJoinCol() {
+	token := fsb.Table("tokens")
+
+	sb := fsb.Select().
+		From(fsb.Table("users")).
+		FullJoin(token, fsb.Eq("users.id", token.Col("user_id")))
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(
+		s.T(),
+		"SELECT * FROM users FULL JOIN tokens ON users.id = tokens.user_id;",
+		sql,
+	)
+	assert.Nil(s.T(), err)
+}
+
+func (s *SelectSuite) Test_SelectString_FullJoinTable() {
+	user := fsb.Table("users").As("u")
+	token := fsb.Table("tokens").As("t")
+
+	sb := fsb.Select(user.Col("id")).
+		From(user).
+		FullJoin(token, fsb.Eq(user.Col("id"), token.Col("user_id")))
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(
+		s.T(),
+		"SELECT u.id FROM users AS u FULL JOIN tokens AS t ON u.id = t.user_id;",
+		sql,
+	)
+	assert.Nil(s.T(), err)
+}
+
 func TestSelectSuite(t *testing.T) {
 	suite.Run(t, new(SelectSuite))
 }
