@@ -172,43 +172,7 @@ func (s *SelectContainer) ToSQL() (string, error) {
 	}
 
 	if len(s.joins) > 0 {
-		for _, join := range s.joins {
-			joinTypeStr := ""
-			switch join.joinType {
-			case inner:
-				joinTypeStr = "INNER JOIN"
-			case left:
-				joinTypeStr = "LEFT JOIN"
-			case right:
-				joinTypeStr = "RIGHT JOIN"
-			case full:
-				joinTypeStr = "FULL JOIN"
-			case cross:
-				joinTypeStr = "CROSS JOIN"
-			}
-
-			joinConditions := make([]string, len(join.conditions))
-			for i, condition := range join.conditions {
-				joinConditions[i] = condition.condition
-			}
-
-			tn := join.table.name
-			if join.table.name != join.table.bName {
-				tn = fmt.Sprintf("%s AS %s", join.table.bName, join.table.name)
-			}
-
-			if len(joinConditions) > 0 {
-				sqlElements = append(
-					sqlElements,
-					fmt.Sprintf("%s %s ON %s", joinTypeStr, tn, strings.Join(joinConditions, " AND ")),
-				)
-			} else {
-				sqlElements = append(
-					sqlElements,
-					fmt.Sprintf("%s %s", joinTypeStr, tn),
-				)
-			}
-		}
+		sqlElements = s.createJoinSQL(sqlElements)
 	}
 
 	if s.where != nil {
@@ -216,4 +180,46 @@ func (s *SelectContainer) ToSQL() (string, error) {
 	}
 
 	return fmt.Sprintf("%s;", strings.Join(sqlElements, " ")), nil
+}
+
+func (s *SelectContainer) createJoinSQL(sqlElements []string) []string {
+	for _, join := range s.joins {
+		joinTypeStr := ""
+		switch join.joinType {
+		case inner:
+			joinTypeStr = "INNER JOIN"
+		case left:
+			joinTypeStr = "LEFT JOIN"
+		case right:
+			joinTypeStr = "RIGHT JOIN"
+		case full:
+			joinTypeStr = "FULL JOIN"
+		case cross:
+			joinTypeStr = "CROSS JOIN"
+		}
+
+		joinConditions := make([]string, len(join.conditions))
+		for i, condition := range join.conditions {
+			joinConditions[i] = condition.condition
+		}
+
+		tn := join.table.name
+		if join.table.name != join.table.bName {
+			tn = fmt.Sprintf("%s AS %s", join.table.bName, join.table.name)
+		}
+
+		if len(joinConditions) > 0 {
+			sqlElements = append(
+				sqlElements,
+				fmt.Sprintf("%s %s ON %s", joinTypeStr, tn, strings.Join(joinConditions, " AND ")),
+			)
+		} else {
+			sqlElements = append(
+				sqlElements,
+				fmt.Sprintf("%s %s", joinTypeStr, tn),
+			)
+		}
+	}
+
+	return sqlElements
 }

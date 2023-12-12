@@ -18,7 +18,7 @@ type Expression struct {
 // It can handle string and int comparison values.
 // The condition is built using the fmt.Sprintf function to format the target and comparison value appropriately.
 // The function returns a pointer to an Expression struct initialized with the condition.
-func Eq(target interface{}, comp interface{}) *Expression {
+func Eq(target, comp interface{}) *Expression {
 	cond := createCondition(target, comp, "=")
 
 	return &Expression{
@@ -30,7 +30,7 @@ func Eq(target interface{}, comp interface{}) *Expression {
 // It can handle string and int comparison values.
 // The condition is built using the fmt.Sprintf function to format the target and comparison value appropriately with the "!=" operator.
 // The function returns a pointer to an Expression struct initialized with the condition.
-func Neq(target interface{}, comp interface{}) *Expression {
+func Neq(target, comp interface{}) *Expression {
 	cond := createCondition(target, comp, "!=")
 
 	return &Expression{
@@ -43,7 +43,7 @@ func Neq(target interface{}, comp interface{}) *Expression {
 // It can handle string and int comparison values.
 // The condition is built using the fmt.Sprintf function to format the target and comparison value appropriately.
 // The function returns a pointer to an Expression struct initialized with the condition.
-func Gt(target interface{}, comp interface{}) *Expression {
+func Gt(target, comp interface{}) *Expression {
 	cond := createCondition(target, comp, ">")
 
 	return &Expression{
@@ -56,7 +56,7 @@ func Gt(target interface{}, comp interface{}) *Expression {
 // The condition is built using the fmt.Sprintf function to format the target and comparison value appropriately,
 // with ">=" as the comparison operator.
 // The function returns a pointer to an Expression struct initialized with the condition.
-func Gte(target interface{}, comp interface{}) *Expression {
+func Gte(target, comp interface{}) *Expression {
 	cond := createCondition(target, comp, ">=")
 
 	return &Expression{
@@ -69,7 +69,7 @@ func Gte(target interface{}, comp interface{}) *Expression {
 // The condition is built using the fmt.Sprintf function to format the target and comparison value appropriately,
 // with a less than (<) symbol.
 // The function returns a pointer to an Expression struct initialized with the condition.
-func Lt(target interface{}, comp interface{}) *Expression {
+func Lt(target, comp interface{}) *Expression {
 	cond := createCondition(target, comp, "<")
 
 	return &Expression{
@@ -81,7 +81,7 @@ func Lt(target interface{}, comp interface{}) *Expression {
 // It can handle string and int comparison values.
 // The condition is built using the fmt.Sprintf function to format the target and comparison value appropriately.
 // The function returns a pointer to an Expression struct initialized with the condition.
-func Lte(target interface{}, comp interface{}) *Expression {
+func Lte(target, comp interface{}) *Expression {
 	cond := createCondition(target, comp, "<=")
 
 	return &Expression{
@@ -94,7 +94,7 @@ func Lte(target interface{}, comp interface{}) *Expression {
 // It handles only string comparison values.
 // The condition is built using the fmt.Sprintf function to format the target and comparison value appropriately.
 // The function returns a pointer to an Expression struct initialized with the condition.
-func Like(target interface{}, comp string) *Expression {
+func Like(target, comp string) *Expression {
 	cond := createCondition(target, comp, "LIKE")
 
 	return &Expression{
@@ -106,7 +106,7 @@ func Like(target interface{}, comp string) *Expression {
 // on the target and comparison value.
 // It uses the "NOT LIKE" sign to build the condition.
 // The function returns a pointer to the Expression struct initialized with the condition.
-func Nlike(target interface{}, comp string) *Expression {
+func Nlike(target, comp string) *Expression {
 	cond := createCondition(target, comp, "NOT LIKE")
 
 	return &Expression{
@@ -120,7 +120,7 @@ func Nlike(target interface{}, comp string) *Expression {
 // The createCondition function is used to create the condition string with the target,
 // converted comparison value, and "LIKE" operator.
 // The function returns a pointer to an Expression struct initialized with the condition.
-func Pm(target interface{}, comp interface{}) *Expression {
+func Pm(target, comp interface{}) *Expression {
 	cond := createCondition(target, sqlLikePrefixPattern(comp), "LIKE")
 
 	return &Expression{
@@ -132,7 +132,7 @@ func Pm(target interface{}, comp interface{}) *Expression {
 // It uses the createCondition function to build the condition using the target,
 // the comparison value converted into a SQL like prefix pattern, and the "NOT LIKE" sign.
 // The function returns a pointer to an Expression struct initialized with the condition.
-func Npm(target interface{}, comp interface{}) *Expression {
+func Npm(target, comp interface{}) *Expression {
 	cond := createCondition(target, sqlLikePrefixPattern(comp), "NOT LIKE")
 
 	return &Expression{
@@ -143,7 +143,7 @@ func Npm(target interface{}, comp interface{}) *Expression {
 // Sm is a function that creates an Expression with a specific condition based on the target and comparison value.
 // It uses the createCondition function to build the condition string using the target,
 // a modified comparison value obtained from the sqlLikeSuffixPattern function, and the "LIKE"
-func Sm(target interface{}, comp interface{}) *Expression {
+func Sm(target, comp interface{}) *Expression {
 	cond := createCondition(target, sqlLikeSuffixPattern(comp), "LIKE")
 
 	return &Expression{
@@ -158,7 +158,7 @@ func Sm(target interface{}, comp interface{}) *Expression {
 // The condition is built using the createCondition function with the target,
 // SQL LIKE suffix pattern, and "NOT LIKE" sign.
 // The function returns a pointer to an Expression struct initialized with the condition.
-func Nsm(target interface{}, comp interface{}) *Expression {
+func Nsm(target, comp interface{}) *Expression {
 	cond := createCondition(target, sqlLikeSuffixPattern(comp), "NOT LIKE")
 
 	return &Expression{
@@ -173,7 +173,7 @@ func Nsm(target interface{}, comp interface{}) *Expression {
 // Then, it calls the createCondition function to create the condition string using the target,
 // the SQL pattern, and the "LIKE" sign.
 // The function returns a pointer to an Expression struct initialized with the condition.
-func Psm(target interface{}, comp interface{}) *Expression {
+func Psm(target, comp interface{}) *Expression {
 	cond := createCondition(target, sqlLikePrefixPattern(sqlLikeSuffixPattern(comp)), "LIKE")
 
 	return &Expression{
@@ -187,7 +187,7 @@ func Psm(target interface{}, comp interface{}) *Expression {
 // and suffix using the sqlLikePrefixPattern and sqlLikeSuffixPattern functions.
 // The condition is built using the createCondition function with the target, converted comp value, and "NOT LIKE" sign.
 // The function returns a pointer to an Expression struct initialized with the condition.
-func Npsm(target interface{}, comp interface{}) *Expression {
+func Npsm(target, comp interface{}) *Expression {
 	cond := createCondition(target, sqlLikePrefixPattern(sqlLikeSuffixPattern(comp)), "NOT LIKE")
 
 	return &Expression{
@@ -200,7 +200,7 @@ func Npsm(target interface{}, comp interface{}) *Expression {
 // It can handle string and int start values and expects the end value to have the same type as the start value.
 // The condition is built using the fmt.Sprintf function to format the target and values appropriately.
 // The function returns a pointer to an Expression struct initialized with the condition.
-func Between(target interface{}, start, end interface{}) *Expression {
+func Between(target, start, end interface{}) *Expression {
 	var cond string
 	switch v := start.(type) {
 	case string:
@@ -219,7 +219,7 @@ func Between(target interface{}, start, end interface{}) *Expression {
 // It can handle string and int comparison values.
 // The condition is built using the fmt.Sprintf function to format the target, start, and end values appropriately.
 // The function returns a pointer to an Expression struct initialized with the condition.
-func Nbetween(target interface{}, start, end interface{}) *Expression {
+func Nbetween(target, start, end interface{}) *Expression {
 	var cond string
 	switch v := start.(type) {
 	case string:
@@ -364,7 +364,7 @@ func IsNotFalse(target interface{}) *Expression {
 // and returns a string representing the condition for the expression.
 // It supports string and int comparison values and formats the condition using fmt.Sprintf.
 // The returned condition string includes the target, sign, and comparison value appropriately formatted.
-func createCondition(target interface{}, comp interface{}, sign string) string {
+func createCondition(target, comp interface{}, sign string) string {
 	tc := convertColumn(target, true)
 	cc := convertColumn(comp, false)
 
