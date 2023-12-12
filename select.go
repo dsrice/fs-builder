@@ -197,10 +197,17 @@ func (s *SelectContainer) ToSQL() (string, error) {
 				tn = fmt.Sprintf("%s AS %s", join.table.bName, join.table.name)
 			}
 
-			sqlElements = append(
-				sqlElements,
-				fmt.Sprintf("%s %s ON %s", joinTypeStr, tn, strings.Join(joinConditions, " AND ")),
-			)
+			if len(joinConditions) > 0 {
+				sqlElements = append(
+					sqlElements,
+					fmt.Sprintf("%s %s ON %s", joinTypeStr, tn, strings.Join(joinConditions, " AND ")),
+				)
+			} else {
+				sqlElements = append(
+					sqlElements,
+					fmt.Sprintf("%s %s", joinTypeStr, tn),
+				)
+			}
 		}
 	}
 

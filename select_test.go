@@ -253,6 +253,17 @@ func (s *SelectSuite) Test_SelectString_LeftJoinTable() {
 	assert.Nil(s.T(), err)
 }
 
+// Test_SelectString_RightJoin tests the SelectString method in the SelectSuite struct
+// with a right join between the "users" and "tokens" tables on the condition "users.id = '1'".
+// It verifies that the generated SQL query is correct and that no errors occur.
+// Example usage:
+//
+//	testSuite := &SelectSuite{}
+//	testSuite.Test_SelectString_RightJoin()
+//
+// Expected Output:
+//
+//	SELECT * FROM users RIGHT JOIN tokens ON users.id = '1';
 func (s *SelectSuite) Test_SelectString_RightJoin() {
 	sb := fsb.Select().
 		From(fsb.Table("users")).
@@ -268,6 +279,14 @@ func (s *SelectSuite) Test_SelectString_RightJoin() {
 	assert.Nil(s.T(), err)
 }
 
+// Test_SelectString_RightJoinCol tests the SelectString method in the SelectSuite struct
+// by constructing a SELECT query with a Right Join and asserting that the generated SQL
+// matches the expected SQL statement.
+// The query joins the "users" table with the "tokens" table on the condition that "users.id"
+// is equal to "tokens.user_id".
+// The expected SQL statement is "SELECT * FROM users RIGHT JOIN tokens ON users.id = tokens.user_id;".
+// The generated SQL statement is compared with the expected SQL statement and any error in the process
+// is checked to be nil using the assert package's Equal and Nil functions, respectively.
 func (s *SelectSuite) Test_SelectString_RightJoinCol() {
 	token := fsb.Table("tokens")
 
@@ -285,6 +304,13 @@ func (s *SelectSuite) Test_SelectString_RightJoinCol() {
 	assert.Nil(s.T(), err)
 }
 
+// Test_SelectString_RightJoinTable tests the SelectString method in the SelectSuite struct.
+// It tests the creation of a SELECT statement with a right join on two tables: users and tokens.
+// The SELECT statement selects the id column from the users table.
+// The right join is performed using the user_id column of the tokens table and the id column of the users table.
+// The resulting SQL statement is compared to the expected SQL statement:
+// "SELECT u.id FROM users AS u RIGHT JOIN tokens AS t ON u.id = t.user_id;".
+// The method also checks for any error that may occur during the creation of the SQL statement.
 func (s *SelectSuite) Test_SelectString_RightJoinTable() {
 	user := fsb.Table("users").As("u")
 	token := fsb.Table("tokens").As("t")
@@ -303,6 +329,13 @@ func (s *SelectSuite) Test_SelectString_RightJoinTable() {
 	assert.Nil(s.T(), err)
 }
 
+// Test_SelectString_FullJoin tests the SelectString method in the SelectSuite struct
+// by creating a SelectBuilder that performs a full join between the "users" table and
+// the "tokens" table using the condition "users.id = '1'". It then calls the ToSQL
+// method to generate the SQL query.
+//
+// It asserts that the generated SQL query is equal to the expected query
+// "SELECT * FROM users FULL JOIN tokens ON users.id = '1';" and that the error is nil.
 func (s *SelectSuite) Test_SelectString_FullJoin() {
 	sb := fsb.Select().
 		From(fsb.Table("users")).
@@ -318,6 +351,10 @@ func (s *SelectSuite) Test_SelectString_FullJoin() {
 	assert.Nil(s.T(), err)
 }
 
+// Test_SelectString_FullJoinCol tests the SelectString method in the SelectSuite struct
+// It creates a SQL SELECT statement with a FULL JOIN using the fsb.Table function,
+// and asserts that the generated SQL matches the expected SQL string.
+// If the SQL generation returns an error, it asserts that the error is nil.
 func (s *SelectSuite) Test_SelectString_FullJoinCol() {
 	token := fsb.Table("tokens")
 
@@ -335,6 +372,11 @@ func (s *SelectSuite) Test_SelectString_FullJoinCol() {
 	assert.Nil(s.T(), err)
 }
 
+// Test_SelectString_FullJoinTable tests the SelectString method in the SelectSuite struct
+// It tests the scenario
+// where we have a full join between two tables and select only the "id" column from the "users" table
+// The generated SQL statement should be "SELECT u.id FROM users AS u FULL JOIN tokens AS t ON u.id = t.user_id;"
+// The test verifies that the expected SQL statement is generated and no error occurs during the process.
 func (s *SelectSuite) Test_SelectString_FullJoinTable() {
 	user := fsb.Table("users").As("u")
 	token := fsb.Table("tokens").As("t")
@@ -348,6 +390,53 @@ func (s *SelectSuite) Test_SelectString_FullJoinTable() {
 	assert.Equal(
 		s.T(),
 		"SELECT u.id FROM users AS u FULL JOIN tokens AS t ON u.id = t.user_id;",
+		sql,
+	)
+	assert.Nil(s.T(), err)
+}
+
+// Test_SelectString_CrossJoin tests the SelectString method in the SelectSuite struct
+// by creating a SELECT query with a CROSS JOIN. The query selects all columns from the
+// "users" table and cross joins it with the "tokens" table.
+//
+// The expected SQL query is "SELECT * FROM users CROSS JOIN tokens;".
+// The actual SQL query is generated using the ToSQL method of the SelectBuilder.
+//
+// The actual SQL query is compared with the expected SQL query using the assert.Equal function
+// from the testify package. If the SQL queries are equal, the test passes; otherwise, it fails.
+//
+// Finally, the test checks if any error occurred during the generation of the SQL query.
+// If there is no error (err is nil), the test passes; otherwise, it fails.
+func (s *SelectSuite) Test_SelectString_CrossJoin() {
+	sb := fsb.Select().
+		From(fsb.Table("users")).
+		CrossJoin(fsb.Table("tokens"))
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(
+		s.T(),
+		"SELECT * FROM users CROSS JOIN tokens;",
+		sql,
+	)
+	assert.Nil(s.T(), err)
+}
+
+// Test_SelectString_CrossJoinTable tests the SelectString method in the SelectSuite struct
+// by performing a cross join between the "users" and "tokens" tables.
+func (s *SelectSuite) Test_SelectString_CrossJoinTable() {
+	user := fsb.Table("users").As("u")
+	token := fsb.Table("tokens").As("t")
+
+	sb := fsb.Select(user.Col("id")).
+		From(user).
+		CrossJoin(token)
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(
+		s.T(),
+		"SELECT u.id FROM users AS u CROSS JOIN tokens AS t;",
 		sql,
 	)
 	assert.Nil(s.T(), err)
