@@ -13,23 +13,46 @@ import (
 type SelectContainer struct {
 	field []string
 	table *TableContainer
+	joins []*JoinContainer
 	where *Expression
 	errs  []error
 }
 
+type JoinContainer struct {
+	joinType   int
+	table      *TableContainer
+	conditions []*Expression
+}
+
+const (
+	inner = 1
+	left  = 2
+	right = 3
+	full  = 4
+	cross = 5
+)
+
 // Select
 // It initializes a new SelectContainer structure.
 // It takes all columns that should be selected. If no columns are passed, it assumes '*' (All columns).
-func Select(fields ...string) *SelectContainer {
+func Select(fields ...interface{}) *SelectContainer {
 	var f []string
 
 	if len(fields) > 0 {
-		f = fields
+		for _, l := range fields {
+			switch v := l.(type) {
+			case string:
+				f = append(f, v)
+			case *ColumnContainer:
+				f = append(f, fmt.Sprintf("%s.%s", v.tName, v.col))
+			}
+		}
 	}
 
 	return &SelectContainer{
 		table: &TableContainer{},
 		field: f,
+		joins: []*JoinContainer{},
 	}
 }
 
@@ -52,6 +75,76 @@ func (s *SelectContainer) Where(conditions *Expression) *SelectContainer {
 	return s
 }
 
+// InnerJoin
+// It adds a INNER JOIN to the select statement.
+// Parameters:
+// - table: the table to join with.
+// - conditions...: optional conditions for the join.
+// Returns:
+// - *SelectContainer: the modified SelectContainer instance with the new join added.
+// Usage example:
+// sb := fsb.Select().
+//
+//	From(fsb.Table("users")).
+//	InnerJoin(fsb.Table("tokens"), fsb.Eq("users.id", "1"))
+//
+// sql, err := sb.ToSQL()
+// Output:
+// "SELECT * FROM users INNER JOIN tokens ON users.id = '1';"
+func (s *SelectContainer) InnerJoin(table *TableContainer, conditions ...*Expression) *SelectContainer {
+	join := JoinContainer{
+		joinType:   inner,
+		table:      table,
+		conditions: conditions,
+	}
+
+	s.joins = append(s.joins, &join)
+	return s
+}
+
+func (s *SelectContainer) LeftJoin(table *TableContainer, conditions ...*Expression) *SelectContainer {
+	join := JoinContainer{
+		joinType:   left,
+		table:      table,
+		conditions: conditions,
+	}
+
+	s.joins = append(s.joins, &join)
+	return s
+}
+
+func (s *SelectContainer) RightJoin(table *TableContainer, conditions ...*Expression) *SelectContainer {
+	join := JoinContainer{
+		joinType:   right,
+		table:      table,
+		conditions: conditions,
+	}
+
+	s.joins = append(s.joins, &join)
+	return s
+}
+
+func (s *SelectContainer) FullJoin(table *TableContainer, conditions ...*Expression) *SelectContainer {
+	join := JoinContainer{
+		joinType:   full,
+		table:      table,
+		conditions: conditions,
+	}
+
+	s.joins = append(s.joins, &join)
+	return s
+}
+
+func (s *SelectContainer) CrossJoin(table *TableContainer) *SelectContainer {
+	join := JoinContainer{
+		joinType: cross,
+		table:    table,
+	}
+
+	s.joins = append(s.joins, &join)
+	return s
+}
+
 // ToSQL
 // It generates a SQL SELECT statement from the configured SelectContainer structure.
 // If any errors exist inside the errs field,
@@ -71,7 +164,15 @@ func (s *SelectContainer) ToSQL() (string, error) {
 	}
 
 	if s.table != nil {
-		sqlElements = append(sqlElements, "FROM", s.table.name)
+		if s.table.name != s.table.bName {
+			sqlElements = append(sqlElements, "FROM", s.table.bName, "AS", s.table.name)
+		} else {
+			sqlElements = append(sqlElements, "FROM", s.table.name)
+		}
+	}
+
+	if len(s.joins) > 0 {
+		sqlElements = s.createJoinSQL(sqlElements)
 	}
 
 	if s.where != nil {
@@ -79,4 +180,46 @@ func (s *SelectContainer) ToSQL() (string, error) {
 	}
 
 	return fmt.Sprintf("%s;", strings.Join(sqlElements, " ")), nil
+}
+
+func (s *SelectContainer) createJoinSQL(sqlElements []string) []string {
+	for _, join := range s.joins {
+		joinTypeStr := ""
+		switch join.joinType {
+		case inner:
+			joinTypeStr = "INNER JOIN"
+		case left:
+			joinTypeStr = "LEFT JOIN"
+		case right:
+			joinTypeStr = "RIGHT JOIN"
+		case full:
+			joinTypeStr = "FULL JOIN"
+		case cross:
+			joinTypeStr = "CROSS JOIN"
+		}
+
+		joinConditions := make([]string, len(join.conditions))
+		for i, condition := range join.conditions {
+			joinConditions[i] = condition.condition
+		}
+
+		tn := join.table.name
+		if join.table.name != join.table.bName {
+			tn = fmt.Sprintf("%s AS %s", join.table.bName, join.table.name)
+		}
+
+		if len(joinConditions) > 0 {
+			sqlElements = append(
+				sqlElements,
+				fmt.Sprintf("%s %s ON %s", joinTypeStr, tn, strings.Join(joinConditions, " AND ")),
+			)
+		} else {
+			sqlElements = append(
+				sqlElements,
+				fmt.Sprintf("%s %s", joinTypeStr, tn),
+			)
+		}
+	}
+
+	return sqlElements
 }
