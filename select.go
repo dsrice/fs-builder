@@ -120,7 +120,11 @@ func (s *SelectContainer) ToSQL() (string, error) {
 	}
 
 	if s.table != nil {
-		sqlElements = append(sqlElements, "FROM", s.table.name)
+		if s.table.name != s.table.bName {
+			sqlElements = append(sqlElements, "FROM", s.table.bName, "AS", s.table.name)
+		} else {
+			sqlElements = append(sqlElements, "FROM", s.table.name)
+		}
 	}
 
 	if len(s.joins) > 0 {
@@ -142,9 +146,14 @@ func (s *SelectContainer) ToSQL() (string, error) {
 				joinConditions[i] = condition.condition
 			}
 
+			tn := join.table.name
+			if join.table.name != join.table.bName {
+				tn = fmt.Sprintf("%s AS %s", join.table.bName, join.table.name)
+			}
+
 			sqlElements = append(
 				sqlElements,
-				fmt.Sprintf("%s %s ON %s", joinTypeStr, join.table.name, strings.Join(joinConditions, " AND ")),
+				fmt.Sprintf("%s %s ON %s", joinTypeStr, tn, strings.Join(joinConditions, " AND ")),
 			)
 		}
 	}

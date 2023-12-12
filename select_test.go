@@ -168,7 +168,7 @@ func (s *SelectSuite) Test_SelectString_InnerJoinTable() {
 
 	assert.Equal(
 		s.T(),
-		"SELECT * FROM users INNER JOIN tokens ON users.id = tokens.user_id;",
+		"SELECT u.id FROM users AS u INNER JOIN tokens AS t ON u.id = t.user_id;",
 		sql,
 	)
 	assert.Nil(s.T(), err)
