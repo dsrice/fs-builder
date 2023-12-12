@@ -249,23 +249,7 @@ func In(target string, list ...interface{}) *Expression {
 	sFlg := false
 
 	for _, l := range list {
-		switch v := l.(type) {
-		case string:
-			println("string")
-			results = append(results, v)
-			sFlg = true
-		case []string:
-			results = append(results, v...)
-			sFlg = true
-		case int:
-			results = append(results, strconv.Itoa(v))
-		case []int:
-			for _, i := range v {
-				results = append(results, strconv.Itoa(i))
-			}
-		default:
-			println(v)
-		}
+		results, sFlg = sqlInPattern(l, results, sFlg)
 	}
 
 	if sFlg {
@@ -286,23 +270,7 @@ func Nin(target string, list ...interface{}) *Expression {
 	sFlg := false
 
 	for _, l := range list {
-		switch v := l.(type) {
-		case string:
-			println("string")
-			results = append(results, v)
-			sFlg = true
-		case []string:
-			results = append(results, v...)
-			sFlg = true
-		case int:
-			results = append(results, strconv.Itoa(v))
-		case []int:
-			for _, i := range v {
-				results = append(results, strconv.Itoa(i))
-			}
-		default:
-			println(v)
-		}
+		results, sFlg = sqlInPattern(l, results, sFlg)
 	}
 
 	if sFlg {
@@ -442,6 +410,27 @@ func sqlLikeSuffixPattern(comp interface{}) string {
 	default:
 		return ""
 	}
+}
+
+func sqlInPattern(l interface{}, results []string, sFlg bool) ([]string, bool) {
+	switch v := l.(type) {
+	case string:
+		results = append(results, v)
+		sFlg = true
+	case []string:
+		results = append(results, v...)
+		sFlg = true
+	case int:
+		results = append(results, strconv.Itoa(v))
+	case []int:
+		for _, i := range v {
+			results = append(results, strconv.Itoa(i))
+		}
+	default:
+		println(v)
+	}
+
+	return results, sFlg
 }
 
 // AND sets the condition of the Expression object with the logical AND operator.
