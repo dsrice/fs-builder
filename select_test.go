@@ -197,6 +197,62 @@ func (s *SelectSuite) Test_SelectString_InnerJoinTable() {
 	assert.Nil(s.T(), err)
 }
 
+// Test_SelectString_LeftJoin tests the LeftJoin method in the SelectContainer struct.
+// It joins the "users" table with the "tokens" table using the condition "users.id = '1'".
+// It then calls the ToSQL method to generate the SQL query string and checks if it matches the expected query.
+func (s *SelectSuite) Test_SelectString_LeftJoin() {
+	sb := fsb.Select().
+		From(fsb.Table("users")).
+		LeftJoin(fsb.Table("tokens"), fsb.Eq("users.id", "1"))
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(
+		s.T(),
+		"SELECT * FROM users LEFT JOIN tokens ON users.id = '1';",
+		sql,
+	)
+	assert.Nil(s.T(), err)
+}
+
+// Test_SelectString_LeftJoinCol tests the SelectString method in the SelectSuite struct
+// with a LeftJoin operation on two tables: "users" and "tokens" based on the condition "users.id
+func (s *SelectSuite) Test_SelectString_LeftJoinCol() {
+	token := fsb.Table("tokens")
+
+	sb := fsb.Select().
+		From(fsb.Table("users")).
+		LeftJoin(token, fsb.Eq("users.id", token.Col("user_id")))
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(
+		s.T(),
+		"SELECT * FROM users LEFT JOIN tokens ON users.id = tokens.user_id;",
+		sql,
+	)
+	assert.Nil(s.T(), err)
+}
+
+// Test_SelectString_LeftJoinTable tests the SelectString method in the SelectSuite struct.
+func (s *SelectSuite) Test_SelectString_LeftJoinTable() {
+	user := fsb.Table("users").As("u")
+	token := fsb.Table("tokens").As("t")
+
+	sb := fsb.Select(user.Col("id")).
+		From(user).
+		LeftJoin(token, fsb.Eq(user.Col("id"), token.Col("user_id")))
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(
+		s.T(),
+		"SELECT u.id FROM users AS u LEFT JOIN tokens AS t ON u.id = t.user_id;",
+		sql,
+	)
+	assert.Nil(s.T(), err)
+}
+
 func TestSelectSuite(t *testing.T) {
 	suite.Run(t, new(SelectSuite))
 }
