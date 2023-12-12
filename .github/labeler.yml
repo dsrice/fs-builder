@@ -1,4 +1,6 @@
 select:
   - select.go
+expression:
+  - expression.go
 core:
   - .github/**/*
