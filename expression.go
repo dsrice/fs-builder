@@ -316,6 +316,82 @@ func Nin(target string, list ...interface{}) *Expression {
 	}
 }
 
+// IsNull is a function that creates an Expression with a condition that checks if the target is null.
+// The target is formatted using fmt.Sprintf to create the condition "target IS NULL".
+// The function returns a pointer to an Expression struct initialized with the condition.
+func IsNull(target string) *Expression {
+	cond := fmt.Sprintf("%s IS NULL", target)
+
+	return &Expression{
+		condition: cond,
+	}
+}
+
+// IsNotNull is a function that creates an Expression with a condition that checks if the specified target is not null.
+// The condition is built using the fmt.Sprintf function to format the target appropriately.
+// The function returns a pointer to an Expression struct initialized with the condition.
+func IsNotNull(target string) *Expression {
+	cond := fmt.Sprintf("%s IS NOT NULL", target)
+
+	return &Expression{
+		condition: cond,
+	}
+}
+
+// IsTrue is a function that creates an Expression with a specific condition based on the target being true.
+// The condition is built using the fmt.Sprintf function to format the target and the boolean value true.
+// The function returns a pointer to an Expression struct initialized with the condition.
+func IsTrue(target string) *Expression {
+	cond := fmt.Sprintf("%s = true", target)
+
+	return &Expression{
+		condition: cond,
+	}
+}
+
+// IsNotTrue is a function that creates an Expression with a specific condition based on the target string.
+// The condition is built using the fmt.Sprintf function to format the target and comparison value.
+// It checks if the target is not equal to true.
+// The function returns a pointer to an Expression struct initialized with the condition.
+func IsNotTrue(target string) *Expression {
+	cond := fmt.Sprintf("%s != true", target)
+
+	return &Expression{
+		condition: cond,
+	}
+}
+
+// IsFalse is a function that creates an Expression with a condition that checks if the target is false.
+// The condition is built using the fmt.Sprintf function to format the target as "%s = false".
+// The function returns a pointer to an Expression struct initialized with the condition.
+// Note: The Expression struct is defined as follows:
+//
+//	type Expression struct {
+//	    condition  string
+//	    bracketFlg bool
+//	}
+//
+// The Expression struct has methods like AND and OR that can be used to combine multiple conditions.
+func IsFalse(target string) *Expression {
+	cond := fmt.Sprintf("%s = false", target)
+
+	return &Expression{
+		condition: cond,
+	}
+}
+
+// IsNotFalse is a function that creates an Expression with a condition that checks if the target is not false.
+// It uses the fmt.Sprintf function to format the condition string.
+// The function returns a pointer to an Expression struct initialized with the condition.
+// The created Expression can be used to build logical expressions using the AND and OR methods.
+func IsNotFalse(target string) *Expression {
+	cond := fmt.Sprintf("%s != false", target)
+
+	return &Expression{
+		condition: cond,
+	}
+}
+
 // createCondition is a function that takes a target string, comparison value, and sign string
 // and returns a string representing the condition for the expression.
 // It supports string and int comparison values and formats the condition using fmt.Sprintf.

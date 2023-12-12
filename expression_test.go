@@ -708,6 +708,66 @@ func (s *ExpressionSuite) Test_NinIntSliceMulti() {
 	assert.Equal(s.T(), "test NOT IN (1, 5, 3)", *ps)
 }
 
+func (s *ExpressionSuite) Test_IsNull() {
+	ex := fsb.IsNull("test")
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test IS NULL", *ps)
+}
+
+func (s *ExpressionSuite) Test_IsNotNull() {
+	ex := fsb.IsNotNull("test")
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test IS NOT NULL", *ps)
+}
+
+func (s *ExpressionSuite) Test_IsTrue() {
+	ex := fsb.IsTrue("test")
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test = true", *ps)
+}
+
+func (s *ExpressionSuite) Test_IsNotTrue() {
+	ex := fsb.IsNotTrue("test")
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test != true", *ps)
+}
+
+func (s *ExpressionSuite) Test_IsFalse() {
+	ex := fsb.IsFalse("test")
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test = false", *ps)
+}
+
+func (s *ExpressionSuite) Test_IsNotFalse() {
+	ex := fsb.IsNotFalse("test")
+
+	v := reflect.ValueOf(ex).Elem()
+	r := v.FieldByName("condition")
+	ps := (*string)(unsafe.Pointer(r.UnsafeAddr()))
+
+	assert.Equal(s.T(), "test != false", *ps)
+}
+
 func TestExpressionSuite(t *testing.T) {
 	suite.Run(t, new(ExpressionSuite))
 }
