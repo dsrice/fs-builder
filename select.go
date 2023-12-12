@@ -7,7 +7,9 @@ import (
 )
 
 // SelectContainer
-// Select関連構造体
+// This structure represents a SQL SELECT statement.
+// It contains fields for the columns being selected (field),
+// hose from (table), condition (where), and a list of errors (errs).
 type SelectContainer struct {
 	field []string
 	table *TableContainer
@@ -16,7 +18,8 @@ type SelectContainer struct {
 }
 
 // Select
-// SelectContainerの呼び出し宣言
+// It initializes a new SelectContainer structure.
+// It takes all columns that should be selected. If no columns are passed, it assumes '*' (All columns).
 func Select(fields ...string) *SelectContainer {
 	var f []string
 
@@ -31,7 +34,10 @@ func Select(fields ...string) *SelectContainer {
 }
 
 // From
-// Select文のメインテーブル宣言
+// It sets the table from which data has to be selected.
+// This method uses a fluent pattern,
+// meaning it returns the instance of the container itself,
+// allowing the calling of multiple methods in a single line (chaining of function calls).
 func (s *SelectContainer) From(table *TableContainer) *SelectContainer {
 	s.table = table
 
@@ -39,7 +45,7 @@ func (s *SelectContainer) From(table *TableContainer) *SelectContainer {
 }
 
 // Where
-// Select文のWhere句宣言
+// It sets the WHERE clause of the SQL SELECT statement.
 func (s *SelectContainer) Where(conditions *Expression) *SelectContainer {
 	s.where = conditions
 
@@ -47,7 +53,10 @@ func (s *SelectContainer) Where(conditions *Expression) *SelectContainer {
 }
 
 // ToSQL
-// Select文のSQL作成処理
+// It generates a SQL SELECT statement from the configured SelectContainer structure.
+// If any errors exist inside the errs field,
+// it will return an empty string and the error.
+// The SQL string is composed by appending different components of the select statement.
 func (s *SelectContainer) ToSQL() (string, error) {
 	if len(s.errs) > 0 {
 		return "", errors.Join(s.errs...)
