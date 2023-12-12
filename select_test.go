@@ -12,6 +12,7 @@ type SelectSuite struct {
 	suite.Suite
 }
 
+// Test_SelectString tests the SelectString method in the SelectSuite struct.
 func (s *SelectSuite) Test_SelectString() {
 	sb := fsb.Select().From(fsb.Table("users"))
 	sql, err := sb.ToSQL()
@@ -20,6 +21,10 @@ func (s *SelectSuite) Test_SelectString() {
 	assert.Nil(s.T(), err)
 }
 
+// Test_SelectString_Field tests the SelectString method in the SelectSuite struct.
+// It selects the "id" field from the "users" table and generates a SQL query.
+// The generated SQL query should be "SELECT id FROM users;".
+// It asserts that the generated SQL query and error are as expected.
 func (s *SelectSuite) Test_SelectString_Field() {
 	sb := fsb.Select("id").From(fsb.Table("users"))
 	sql, err := sb.ToSQL()
@@ -28,6 +33,7 @@ func (s *SelectSuite) Test_SelectString_Field() {
 	assert.Nil(s.T(), err)
 }
 
+// Test_SelectString_WhereInt tests the SelectString_WhereInt method in the SelectSuite struct.
 func (s *SelectSuite) Test_SelectString_WhereInt() {
 	sb := fsb.Select().
 		From(fsb.Table("users")).
@@ -39,6 +45,7 @@ func (s *SelectSuite) Test_SelectString_WhereInt() {
 	assert.Nil(s.T(), err)
 }
 
+// Test_SelectString_WhereString tests the SelectString_WhereString method in the SelectSuite struct.
 func (s *SelectSuite) Test_SelectString_WhereString() {
 	sb := fsb.Select().
 		From(fsb.Table("users")).
@@ -50,6 +57,8 @@ func (s *SelectSuite) Test_SelectString_WhereString() {
 	assert.Nil(s.T(), err)
 }
 
+// Test_SelectString_WhereAND tests the WhereAND method in the SelectSuite struct.
+// It checks if the generated SQL query from SelectString_WhereAnd method matches the expected SQL query.
 func (s *SelectSuite) Test_SelectString_WhereAND() {
 	sb := fsb.Select().
 		From(fsb.Table("users")).
@@ -61,6 +70,7 @@ func (s *SelectSuite) Test_SelectString_WhereAND() {
 	assert.Nil(s.T(), err)
 }
 
+// Test_SelectString_WhereOR tests the WhereOR method in the SelectSuite struct.
 func (s *SelectSuite) Test_SelectString_WhereOR() {
 	sb := fsb.Select().
 		From(fsb.Table("users")).
@@ -72,6 +82,11 @@ func (s *SelectSuite) Test_SelectString_WhereOR() {
 	assert.Nil(s.T(), err)
 }
 
+// Test_SelectString_WhereAndOr tests the SelectString method in the SelectSuite struct.
+// It creates a SelectContainer object and calls the From method to set the table to "users".
+// Then it calls the Where method to set the conditions to "name = 'test' AND (id = 1 OR id = 2)".
+// Finally, it calls the ToSQL method to generate the SQL string and checks if it matches the expected value.
+// The test also checks if there are no errors returned.
 func (s *SelectSuite) Test_SelectString_WhereAndOr() {
 	sb := fsb.Select().
 		From(fsb.Table("users")).
@@ -87,6 +102,7 @@ func (s *SelectSuite) Test_SelectString_WhereAndOr() {
 	assert.Nil(s.T(), err)
 }
 
+// Test_SelectString_WhereOrAnd tests the WhereOrAnd method in the SelectSuite struct.
 func (s *SelectSuite) Test_SelectString_WhereOrAnd() {
 	sb := fsb.Select().
 		From(fsb.Table("users")).
@@ -102,6 +118,10 @@ func (s *SelectSuite) Test_SelectString_WhereOrAnd() {
 	assert.Nil(s.T(), err)
 }
 
+// Test_SelectString_WhereMulti tests the SelectString_WhereMulti method in the SelectSuite struct.
+// Selects from the "users" table with the following conditions:
+// - "name" equals "test" OR ("id" equals 1 AND "id" equals 2)
+// - AND ("login_id" equals "test2" AND "name" equals "name2")
 func (s *SelectSuite) Test_SelectString_WhereMulti() {
 	sb := fsb.Select().
 		From(fsb.Table("users")).
@@ -124,6 +144,7 @@ func (s *SelectSuite) Test_SelectString_WhereMulti() {
 	assert.Nil(s.T(), err)
 }
 
+// Test_SelectString_InnerJoin tests the SelectString method in the SelectSuite struct.
 func (s *SelectSuite) Test_SelectString_InnerJoin() {
 	sb := fsb.Select().
 		From(fsb.Table("users")).
@@ -139,6 +160,7 @@ func (s *SelectSuite) Test_SelectString_InnerJoin() {
 	assert.Nil(s.T(), err)
 }
 
+// Test_SelectString_InnerJoinCol tests the SelectString method with InnerJoinCol in the SelectSuite struct.
 func (s *SelectSuite) Test_SelectString_InnerJoinCol() {
 	token := fsb.Table("tokens")
 
@@ -156,6 +178,7 @@ func (s *SelectSuite) Test_SelectString_InnerJoinCol() {
 	assert.Nil(s.T(), err)
 }
 
+// Test_SelectString_InnerJoinTable tests the SelectString method in the SelectSuite struct
 func (s *SelectSuite) Test_SelectString_InnerJoinTable() {
 	user := fsb.Table("users").As("u")
 	token := fsb.Table("tokens").As("t")

@@ -28,7 +28,8 @@ const (
 	inner = 1
 	left  = 2
 	right = 3
-	cross = 4
+	full  = 4
+	cross = 5
 )
 
 // Select
@@ -101,6 +102,49 @@ func (s *SelectContainer) InnerJoin(table *TableContainer, conditions ...*Expres
 	return s
 }
 
+func (s *SelectContainer) LeftJoin(table *TableContainer, conditions ...*Expression) *SelectContainer {
+	join := JoinContainer{
+		joinType:   left,
+		table:      table,
+		conditions: conditions,
+	}
+
+	s.joins = append(s.joins, &join)
+	return s
+}
+
+func (s *SelectContainer) RightJoin(table *TableContainer, conditions ...*Expression) *SelectContainer {
+	join := JoinContainer{
+		joinType:   right,
+		table:      table,
+		conditions: conditions,
+	}
+
+	s.joins = append(s.joins, &join)
+	return s
+}
+
+func (s *SelectContainer) FullJoin(table *TableContainer, conditions ...*Expression) *SelectContainer {
+	join := JoinContainer{
+		joinType:   right,
+		table:      table,
+		conditions: conditions,
+	}
+
+	s.joins = append(s.joins, &join)
+	return s
+}
+
+func (s *SelectContainer) CrossJoin(table *TableContainer) *SelectContainer {
+	join := JoinContainer{
+		joinType: right,
+		table:    table,
+	}
+
+	s.joins = append(s.joins, &join)
+	return s
+}
+
 // ToSQL
 // It generates a SQL SELECT statement from the configured SelectContainer structure.
 // If any errors exist inside the errs field,
@@ -137,6 +181,8 @@ func (s *SelectContainer) ToSQL() (string, error) {
 				joinTypeStr = "LEFT JOIN"
 			case right:
 				joinTypeStr = "RIGHT JOIN"
+			case full:
+				joinTypeStr = "CROSS JOIN"
 			case cross:
 				joinTypeStr = "CROSS JOIN"
 			}
