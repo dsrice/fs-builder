@@ -13,9 +13,23 @@ import (
 type SelectContainer struct {
 	field []string
 	table *TableContainer
+	joins []*JoinContainer
 	where *Expression
 	errs  []error
 }
+
+type JoinContainer struct {
+	joinType   int
+	table      *TableContainer
+	conditions []*Expression
+}
+
+const (
+	inner = 1
+	left  = 2
+	right = 3
+	cross = 4
+)
 
 // Select
 // It initializes a new SelectContainer structure.
@@ -30,6 +44,7 @@ func Select(fields ...string) *SelectContainer {
 	return &SelectContainer{
 		table: &TableContainer{},
 		field: f,
+		joins: []*JoinContainer{},
 	}
 }
 
@@ -49,6 +64,17 @@ func (s *SelectContainer) From(table *TableContainer) *SelectContainer {
 func (s *SelectContainer) Where(conditions *Expression) *SelectContainer {
 	s.where = conditions
 
+	return s
+}
+
+func (s *SelectContainer) InnerJoin(table *TableContainer, conditions ...*Expression) *SelectContainer {
+	join := JoinContainer{
+		joinType:   inner,
+		table:      table,
+		conditions: conditions,
+	}
+
+	s.joins = append(s.joins, &join)
 	return s
 }
 
@@ -72,6 +98,32 @@ func (s *SelectContainer) ToSQL() (string, error) {
 
 	if s.table != nil {
 		sqlElements = append(sqlElements, "FROM", s.table.name)
+	}
+
+	if len(s.joins) > 0 {
+		for _, join := range s.joins {
+			joinTypeStr := ""
+			switch join.joinType {
+			case inner:
+				joinTypeStr = "INNER JOIN"
+			case left:
+				joinTypeStr = "LEFT JOIN"
+			case right:
+				joinTypeStr = "RIGHT JOIN"
+			case cross:
+				joinTypeStr = "CROSS JOIN"
+			}
+
+			joinConditions := make([]string, len(join.conditions))
+			for i, condition := range join.conditions {
+				joinConditions[i] = condition.condition
+			}
+
+			sqlElements = append(
+				sqlElements,
+				fmt.Sprintf("%s %s ON %s", joinTypeStr, join.table.name, strings.Join(joinConditions, " AND ")),
+			)
+		}
 	}
 
 	if s.where != nil {

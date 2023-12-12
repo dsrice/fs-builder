@@ -124,6 +124,21 @@ func (s *SelectSuite) Test_SelectString_WhereMulti() {
 	assert.Nil(s.T(), err)
 }
 
+func (s *SelectSuite) Test_SelectString_InnerJoin() {
+	sb := fsb.Select().
+		From(fsb.Table("users")).
+		InnerJoin(fsb.Table("tokens"), fsb.Eq("users.id", "1"))
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(
+		s.T(),
+		"SELECT * FROM users INNER JOIN tokens ON users.id = '1';",
+		sql,
+	)
+	assert.Nil(s.T(), err)
+}
+
 func TestSelectSuite(t *testing.T) {
 	suite.Run(t, new(SelectSuite))
 }
