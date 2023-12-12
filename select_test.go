@@ -139,6 +139,41 @@ func (s *SelectSuite) Test_SelectString_InnerJoin() {
 	assert.Nil(s.T(), err)
 }
 
+func (s *SelectSuite) Test_SelectString_InnerJoinCol() {
+	token := fsb.Table("tokens")
+
+	sb := fsb.Select().
+		From(fsb.Table("users")).
+		InnerJoin(token, fsb.Eq("users.id", token.Col("user_id")))
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(
+		s.T(),
+		"SELECT * FROM users INNER JOIN tokens ON users.id = tokens.user_id;",
+		sql,
+	)
+	assert.Nil(s.T(), err)
+}
+
+func (s *SelectSuite) Test_SelectString_InnerJoinTable() {
+	user := fsb.Table("users").As("u")
+	token := fsb.Table("tokens").As("t")
+
+	sb := fsb.Select(user.Col("id")).
+		From(user).
+		InnerJoin(token, fsb.Eq(user.Col("id"), token.Col("user_id")))
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(
+		s.T(),
+		"SELECT * FROM users INNER JOIN tokens ON users.id = tokens.user_id;",
+		sql,
+	)
+	assert.Nil(s.T(), err)
+}
+
 func TestSelectSuite(t *testing.T) {
 	suite.Run(t, new(SelectSuite))
 }

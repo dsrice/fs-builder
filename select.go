@@ -34,11 +34,18 @@ const (
 // Select
 // It initializes a new SelectContainer structure.
 // It takes all columns that should be selected. If no columns are passed, it assumes '*' (All columns).
-func Select(fields ...string) *SelectContainer {
+func Select(fields ...interface{}) *SelectContainer {
 	var f []string
 
 	if len(fields) > 0 {
-		f = fields
+		for _, l := range fields {
+			switch v := l.(type) {
+			case string:
+				f = append(f, v)
+			case *ColumnContainer:
+				f = append(f, fmt.Sprintf("%s.%s", v.tName, v.col))
+			}
+		}
 	}
 
 	return &SelectContainer{
@@ -67,6 +74,22 @@ func (s *SelectContainer) Where(conditions *Expression) *SelectContainer {
 	return s
 }
 
+// InnerJoin
+// It adds a INNER JOIN to the select statement.
+// Parameters:
+// - table: the table to join with.
+// - conditions...: optional conditions for the join.
+// Returns:
+// - *SelectContainer: the modified SelectContainer instance with the new join added.
+// Usage example:
+// sb := fsb.Select().
+//
+//	From(fsb.Table("users")).
+//	InnerJoin(fsb.Table("tokens"), fsb.Eq("users.id", "1"))
+//
+// sql, err := sb.ToSQL()
+// Output:
+// "SELECT * FROM users INNER JOIN tokens ON users.id = '1';"
 func (s *SelectContainer) InnerJoin(table *TableContainer, conditions ...*Expression) *SelectContainer {
 	join := JoinContainer{
 		joinType:   inner,
