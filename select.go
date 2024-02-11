@@ -16,6 +16,10 @@ type SelectContainer struct {
 	joins  []*JoinContainer
 	where  *Expression
 	orders []*OrderContainer
+	limit  int
+	offset int
+	group  *GroupByContainer
+	having *Expression
 	errs   []error
 }
 
@@ -28,6 +32,10 @@ type JoinContainer struct {
 type OrderContainer struct {
 	orderType      int
 	orderColumnStr string
+}
+
+type GroupByContainer struct {
+	groupColumnStr string
 }
 
 const (
@@ -63,6 +71,8 @@ func Select(fields ...interface{}) *SelectContainer {
 		field:  f,
 		joins:  []*JoinContainer{},
 		orders: []*OrderContainer{},
+		limit:  0,
+		offset: 0,
 	}
 }
 
@@ -92,15 +102,6 @@ func (s *SelectContainer) Where(conditions *Expression) *SelectContainer {
 // - conditions...: optional conditions for the join.
 // Returns:
 // - *SelectContainer: the modified SelectContainer instance with the new join added.
-// Usage example:
-// sb := fsb.Select().
-//
-//	From(fsb.Table("users")).
-//	InnerJoin(fsb.Table("tokens"), fsb.Eq("users.id", "1"))
-//
-// sql, err := sb.ToSQL()
-// Output:
-// "SELECT * FROM users INNER JOIN tokens ON users.id = '1';"
 func (s *SelectContainer) InnerJoin(table *TableContainer, conditions ...*Expression) *SelectContainer {
 	join := JoinContainer{
 		joinType:   inner,
@@ -156,6 +157,18 @@ func (s *SelectContainer) CrossJoin(table *TableContainer) *SelectContainer {
 }
 
 func (s *SelectContainer) Order(conditions ...interface{}) *SelectContainer {
+	orderStr := createOrderString(conditions)
+
+	order := OrderContainer{
+		orderType:      asc,
+		orderColumnStr: orderStr,
+	}
+
+	s.orders = append(s.orders, &order)
+	return s
+}
+
+func createOrderString(conditions []interface{}) string {
 	orderStr := ""
 	for i, condition := range conditions {
 		if i > 0 {
@@ -165,12 +178,98 @@ func (s *SelectContainer) Order(conditions ...interface{}) *SelectContainer {
 		}
 	}
 
+	return orderStr
+}
+
+func (s *SelectContainer) ASC() *SelectContainer {
+	if len(s.orders) == 0 {
+		s.errs = append(s.errs, fmt.Errorf("no set order"))
+		return s
+	}
+
+	orders := s.orders[len(s.orders)-1]
+	orders.orderType = asc
+	s.orders[len(s.orders)-1] = orders
+
+	return s
+}
+
+func (s *SelectContainer) DESC() *SelectContainer {
+	if len(s.orders) == 0 {
+		s.errs = append(s.errs, fmt.Errorf("no set order"))
+		return s
+	}
+
+	orders := s.orders[len(s.orders)-1]
+	orders.orderType = desc
+	s.orders[len(s.orders)-1] = orders
+
+	return s
+}
+
+func (s *SelectContainer) OrderA(conditions ...interface{}) *SelectContainer {
+	orderStr := createOrderString(conditions)
+
 	order := OrderContainer{
 		orderType:      asc,
 		orderColumnStr: orderStr,
 	}
 
 	s.orders = append(s.orders, &order)
+	return s
+}
+
+func (s *SelectContainer) OrderDe(conditions ...interface{}) *SelectContainer {
+	orderStr := createOrderString(conditions)
+
+	order := OrderContainer{
+		orderType:      desc,
+		orderColumnStr: orderStr,
+	}
+
+	s.orders = append(s.orders, &order)
+	return s
+}
+
+func (s *SelectContainer) Limit(count int) *SelectContainer {
+	s.limit = count
+
+	return s
+}
+
+func (s *SelectContainer) Offset(count int) *SelectContainer {
+	s.offset = count
+
+	return s
+}
+
+func (s *SelectContainer) GroupBy(conditions ...interface{}) *SelectContainer {
+	groupStr := createGroupByString(conditions)
+
+	group := GroupByContainer{
+		groupColumnStr: groupStr,
+	}
+
+	s.group = &group
+	return s
+}
+
+func createGroupByString(conditions []interface{}) string {
+	groupStr := ""
+	for i, condition := range conditions {
+		if i > 0 {
+			groupStr = fmt.Sprintf("%s, %s", groupStr, ConvertColumn(condition, true))
+		} else {
+			groupStr = ConvertColumn(condition, true)
+		}
+	}
+
+	return groupStr
+}
+
+func (s *SelectContainer) Having(conditions *Expression) *SelectContainer {
+	s.having = conditions
+
 	return s
 }
 
@@ -208,8 +307,24 @@ func (s *SelectContainer) ToSQL() (string, error) {
 		sqlElements = append(sqlElements, "WHERE", s.where.condition)
 	}
 
+	if s.group != nil {
+		sqlElements = append(sqlElements, "GROUP BY", s.group.groupColumnStr)
+	}
+
+	if s.having != nil {
+		sqlElements = append(sqlElements, "HAVING", s.having.condition)
+	}
+
 	if len(s.orders) > 0 {
 		sqlElements = s.createOrderSQL(sqlElements)
+	}
+
+	if s.limit > 0 {
+		sqlElements = append(sqlElements, fmt.Sprintf("LIMIT %d", s.limit))
+	}
+
+	if s.offset > 0 {
+		sqlElements = append(sqlElements, fmt.Sprintf("OFFSET %d", s.offset))
 	}
 
 	return fmt.Sprintf("%s;", strings.Join(sqlElements, " ")), nil
@@ -261,7 +376,7 @@ func (s *SelectContainer) createOrderSQL(elements []string) []string {
 	orderStr := "ORDER BY"
 	for i, order := range s.orders {
 		if i > 0 {
-			orderStr = fmt.Sprintf("%s, ", orderStr)
+			orderStr = fmt.Sprintf("%s,", orderStr)
 		}
 		orderStr = fmt.Sprintf("%s %s", orderStr, order.orderColumnStr)
 
@@ -271,9 +386,9 @@ func (s *SelectContainer) createOrderSQL(elements []string) []string {
 		case desc:
 			orderStr = fmt.Sprintf("%s %s", orderStr, "DESC")
 		}
-
-		elements = append(elements, orderStr)
 	}
+
+	elements = append(elements, orderStr)
 
 	return elements
 }
