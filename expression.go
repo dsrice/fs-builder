@@ -365,14 +365,15 @@ func IsNotFalse(target interface{}) *Expression {
 // It supports string and int comparison values and formats the condition using fmt.Sprintf.
 // The returned condition string includes the target, sign, and comparison value appropriately formatted.
 func createCondition(target, comp interface{}, sign string) string {
-	tc := convertColumn(target, true)
-	cc := convertColumn(comp, false)
+	tc := ConvertColumn(target, true)
+	cc := ConvertColumn(comp, false)
 
 	return fmt.Sprintf("%s %s %s", tc, sign, cc)
 }
 
-// Convert target and comp values into string representations and build a condition
-func convertColumn(target interface{}, nFlg bool) string {
+// ConvertColumn is a function that takes a target value and a boolean flag.
+// It converts the target value to a string based on its type, and the flag determines whether to add quotation marks around strings.
+func ConvertColumn(target interface{}, nFlg bool) string {
 	switch t := target.(type) {
 	case string:
 		if nFlg {
