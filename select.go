@@ -18,6 +18,7 @@ type SelectContainer struct {
 	orders []*OrderContainer
 	limit  int
 	offset int
+	group  *GroupByContainer
 	errs   []error
 }
 
@@ -30,6 +31,10 @@ type JoinContainer struct {
 type OrderContainer struct {
 	orderType      int
 	orderColumnStr string
+}
+
+type GroupByContainer struct {
+	groupColumnStr string
 }
 
 const (
@@ -246,6 +251,30 @@ func (s *SelectContainer) Offset(count int) *SelectContainer {
 	return s
 }
 
+func (s *SelectContainer) GroupBy(conditions ...interface{}) *SelectContainer {
+	groupStr := createGroupByString(conditions)
+
+	group := GroupByContainer{
+		groupColumnStr: groupStr,
+	}
+
+	s.group = &group
+	return s
+}
+
+func createGroupByString(conditions []interface{}) string {
+	groupStr := ""
+	for i, condition := range conditions {
+		if i > 0 {
+			groupStr = fmt.Sprintf("%s, %s", groupStr, ConvertColumn(condition, true))
+		} else {
+			groupStr = ConvertColumn(condition, true)
+		}
+	}
+
+	return groupStr
+}
+
 // ToSQL
 // It generates a SQL SELECT statement from the configured SelectContainer structure.
 // If any errors exist inside the errs field,
@@ -278,6 +307,10 @@ func (s *SelectContainer) ToSQL() (string, error) {
 
 	if s.where != nil {
 		sqlElements = append(sqlElements, "WHERE", s.where.condition)
+	}
+
+	if s.group != nil {
+		sqlElements = append(sqlElements, "GROUP BY", s.group.groupColumnStr)
 	}
 
 	if len(s.orders) > 0 {

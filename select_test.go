@@ -632,6 +632,38 @@ func (s *SelectSuite) Test_SelectString_Offset() {
 	assert.Nil(s.T(), err)
 }
 
+func (s *SelectSuite) Test_SelectString_GroupByString() {
+	user := fsb.Table("users").As("u")
+
+	sb := fsb.Select(user.Col("id")).
+		From(user).GroupBy("id")
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(
+		s.T(),
+		"SELECT u.id FROM users AS u GROUP BY id;",
+		sql,
+	)
+	assert.Nil(s.T(), err)
+}
+
+func (s *SelectSuite) Test_SelectString_GroupByColumn() {
+	user := fsb.Table("users").As("u")
+
+	sb := fsb.Select(user.Col("id")).
+		From(user).GroupBy(user.Col("id"))
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(
+		s.T(),
+		"SELECT u.id FROM users AS u GROUP BY u.id;",
+		sql,
+	)
+	assert.Nil(s.T(), err)
+}
+
 func TestSelectSuite(t *testing.T) {
 	suite.Run(t, new(SelectSuite))
 }
