@@ -396,17 +396,8 @@ func (s *SelectSuite) Test_SelectString_FullJoinTable() {
 }
 
 // Test_SelectString_CrossJoin tests the SelectString method in the SelectSuite struct
-// by creating a SELECT query with a CROSS JOIN. The query selects all columns from the
-// "users" table and cross joins it with the "tokens" table.
-//
-// The expected SQL query is "SELECT * FROM users CROSS JOIN tokens;".
-// The actual SQL query is generated using the ToSQL method of the SelectBuilder.
-//
-// The actual SQL query is compared with the expected SQL query using the assert.Equal function
-// from the testify package. If the SQL queries are equal, the test passes; otherwise, it fails.
-//
-// Finally, the test checks if any error occurred during the generation of the SQL query.
-// If there is no error (err is nil), the test passes; otherwise, it fails.
+// It creates a select query, performs a cross join of two tables (users and tokens),
+// and checks if the generated SQL statement is correct.
 func (s *SelectSuite) Test_SelectString_CrossJoin() {
 	sb := fsb.Select().
 		From(fsb.Table("users")).
