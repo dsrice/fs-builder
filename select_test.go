@@ -632,6 +632,7 @@ func (s *SelectSuite) Test_SelectString_Offset() {
 	assert.Nil(s.T(), err)
 }
 
+// Test_SelectString_GroupByString tests the SelectString method in the SelectSuite struct.
 func (s *SelectSuite) Test_SelectString_GroupByString() {
 	user := fsb.Table("users").As("u")
 
@@ -648,6 +649,58 @@ func (s *SelectSuite) Test_SelectString_GroupByString() {
 	assert.Nil(s.T(), err)
 }
 
+// Test_SelectString_GroupByMultiString tests the SelectString_GroupByMultiString method in the SelectSuite struct.
+func (s *SelectSuite) Test_SelectString_GroupByMultiString() {
+	user := fsb.Table("users").As("u")
+
+	sb := fsb.Select(user.Col("id"), user.Col("name")).
+		From(user).GroupBy("id", "name")
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(
+		s.T(),
+		"SELECT u.id, u.name FROM users AS u GROUP BY id, name;",
+		sql,
+	)
+	assert.Nil(s.T(), err)
+}
+
+// Test_SelectString_GroupByMultiColumn tests the SelectString method in the SelectSuite struct.
+func (s *SelectSuite) Test_SelectString_GroupByMultiColumn() {
+	user := fsb.Table("users").As("u")
+
+	sb := fsb.Select(user.Col("id"), user.Col("name")).
+		From(user).GroupBy(user.Col("id"), user.Col("name"))
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(
+		s.T(),
+		"SELECT u.id, u.name FROM users AS u GROUP BY u.id, u.name;",
+		sql,
+	)
+	assert.Nil(s.T(), err)
+}
+
+// Test_SelectString_GroupByMulti tests the SelectString_GroupByMulti method in the SelectSuite struct.
+func (s *SelectSuite) Test_SelectString_GroupByMulti() {
+	user := fsb.Table("users").As("u")
+
+	sb := fsb.Select(user.Col("id"), user.Col("name")).
+		From(user).GroupBy(user.Col("id"), "name")
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(
+		s.T(),
+		"SELECT u.id, u.name FROM users AS u GROUP BY u.id, name;",
+		sql,
+	)
+	assert.Nil(s.T(), err)
+}
+
+// Test_SelectString_GroupByColumn tests the SelectString method in the SelectSuite struct.
 func (s *SelectSuite) Test_SelectString_GroupByColumn() {
 	user := fsb.Table("users").As("u")
 
