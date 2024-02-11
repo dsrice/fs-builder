@@ -174,6 +174,28 @@ func (s *SelectContainer) Order(conditions ...interface{}) *SelectContainer {
 	return s
 }
 
+func (s *SelectContainer) ASC() *SelectContainer {
+	if len(s.orders) == 0 {
+		s.errs = append(s.errs, fmt.Errorf("no set order"))
+		return s
+	}
+
+	s.orders[len(s.orders)-1].orderType = asc
+
+	return s
+}
+
+func (s *SelectContainer) DESC() *SelectContainer {
+	if len(s.orders) == 0 {
+		s.errs = append(s.errs, fmt.Errorf("no set order"))
+		return s
+	}
+
+	s.orders[len(s.orders)-1].orderType = desc
+
+	return s
+}
+
 // ToSQL
 // It generates a SQL SELECT statement from the configured SelectContainer structure.
 // If any errors exist inside the errs field,
