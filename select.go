@@ -156,14 +156,7 @@ func (s *SelectContainer) CrossJoin(table *TableContainer) *SelectContainer {
 }
 
 func (s *SelectContainer) Order(conditions ...interface{}) *SelectContainer {
-	orderStr := ""
-	for i, condition := range conditions {
-		if i > 0 {
-			orderStr = fmt.Sprintf("%s, %s", orderStr, ConvertColumn(condition, true))
-		} else {
-			orderStr = ConvertColumn(condition, true)
-		}
-	}
+	orderStr := createOrderString(conditions)
 
 	order := OrderContainer{
 		orderType:      asc,
@@ -174,13 +167,28 @@ func (s *SelectContainer) Order(conditions ...interface{}) *SelectContainer {
 	return s
 }
 
+func createOrderString(conditions []interface{}) string {
+	orderStr := ""
+	for i, condition := range conditions {
+		if i > 0 {
+			orderStr = fmt.Sprintf("%s, %s", orderStr, ConvertColumn(condition, true))
+		} else {
+			orderStr = ConvertColumn(condition, true)
+		}
+	}
+
+	return orderStr
+}
+
 func (s *SelectContainer) ASC() *SelectContainer {
 	if len(s.orders) == 0 {
 		s.errs = append(s.errs, fmt.Errorf("no set order"))
 		return s
 	}
 
-	s.orders[len(s.orders)-1].orderType = asc
+	orders := s.orders[len(s.orders)-1]
+	orders.orderType = asc
+	s.orders[len(s.orders)-1] = orders
 
 	return s
 }
@@ -191,8 +199,34 @@ func (s *SelectContainer) DESC() *SelectContainer {
 		return s
 	}
 
-	s.orders[len(s.orders)-1].orderType = desc
+	orders := s.orders[len(s.orders)-1]
+	orders.orderType = desc
+	s.orders[len(s.orders)-1] = orders
 
+	return s
+}
+
+func (s *SelectContainer) OrderA(conditions ...interface{}) *SelectContainer {
+	orderStr := createOrderString(conditions)
+
+	order := OrderContainer{
+		orderType:      asc,
+		orderColumnStr: orderStr,
+	}
+
+	s.orders = append(s.orders, &order)
+	return s
+}
+
+func (s *SelectContainer) OrderDe(conditions ...interface{}) *SelectContainer {
+	orderStr := createOrderString(conditions)
+
+	order := OrderContainer{
+		orderType:      desc,
+		orderColumnStr: orderStr,
+	}
+
+	s.orders = append(s.orders, &order)
 	return s
 }
 
@@ -283,7 +317,7 @@ func (s *SelectContainer) createOrderSQL(elements []string) []string {
 	orderStr := "ORDER BY"
 	for i, order := range s.orders {
 		if i > 0 {
-			orderStr = fmt.Sprintf("%s, ", orderStr)
+			orderStr = fmt.Sprintf("%s,", orderStr)
 		}
 		orderStr = fmt.Sprintf("%s %s", orderStr, order.orderColumnStr)
 
@@ -293,9 +327,9 @@ func (s *SelectContainer) createOrderSQL(elements []string) []string {
 		case desc:
 			orderStr = fmt.Sprintf("%s %s", orderStr, "DESC")
 		}
-
-		elements = append(elements, orderStr)
 	}
+
+	elements = append(elements, orderStr)
 
 	return elements
 }
