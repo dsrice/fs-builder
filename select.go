@@ -11,11 +11,12 @@ import (
 // It contains fields for the columns being selected (field),
 // hose from (table), condition (where), and a list of errors (errs).
 type SelectContainer struct {
-	field []string
-	table *TableContainer
-	joins []*JoinContainer
-	where *Expression
-	errs  []error
+	field  []string
+	table  *TableContainer
+	joins  []*JoinContainer
+	where  *Expression
+	orders []*OrderContainer
+	errs   []error
 }
 
 type JoinContainer struct {
@@ -24,12 +25,20 @@ type JoinContainer struct {
 	conditions []*Expression
 }
 
+type OrderContainer struct {
+	orderType      int
+	orderColumnStr string
+}
+
 const (
 	inner = 1
 	left  = 2
 	right = 3
 	full  = 4
 	cross = 5
+
+	asc  = 1
+	desc = 2
 )
 
 // Select
@@ -50,9 +59,10 @@ func Select(fields ...interface{}) *SelectContainer {
 	}
 
 	return &SelectContainer{
-		table: &TableContainer{},
-		field: f,
-		joins: []*JoinContainer{},
+		table:  &TableContainer{},
+		field:  f,
+		joins:  []*JoinContainer{},
+		orders: []*OrderContainer{},
 	}
 }
 
@@ -145,6 +155,25 @@ func (s *SelectContainer) CrossJoin(table *TableContainer) *SelectContainer {
 	return s
 }
 
+func (s *SelectContainer) Order(conditions ...interface{}) *SelectContainer {
+	orderStr := ""
+	for i, condition := range conditions {
+		if i > 0 {
+			orderStr = fmt.Sprintf("%s, %s", orderStr, ConvertColumn(condition, true))
+		} else {
+			orderStr = ConvertColumn(condition, true)
+		}
+	}
+
+	order := OrderContainer{
+		orderType:      asc,
+		orderColumnStr: orderStr,
+	}
+
+	s.orders = append(s.orders, &order)
+	return s
+}
+
 // ToSQL
 // It generates a SQL SELECT statement from the configured SelectContainer structure.
 // If any errors exist inside the errs field,
@@ -177,6 +206,10 @@ func (s *SelectContainer) ToSQL() (string, error) {
 
 	if s.where != nil {
 		sqlElements = append(sqlElements, "WHERE", s.where.condition)
+	}
+
+	if len(s.orders) > 0 {
+		sqlElements = s.createOrderSQL(sqlElements)
 	}
 
 	return fmt.Sprintf("%s;", strings.Join(sqlElements, " ")), nil
@@ -222,4 +255,25 @@ func (s *SelectContainer) createJoinSQL(sqlElements []string) []string {
 	}
 
 	return sqlElements
+}
+
+func (s *SelectContainer) createOrderSQL(elements []string) []string {
+	orderStr := "ORDER BY"
+	for i, order := range s.orders {
+		if i > 0 {
+			orderStr = fmt.Sprintf("%s, ", orderStr)
+		}
+		orderStr = fmt.Sprintf("%s %s", orderStr, order.orderColumnStr)
+
+		switch order.orderType {
+		case asc:
+			orderStr = fmt.Sprintf("%s %s", orderStr, "ASC")
+		case desc:
+			orderStr = fmt.Sprintf("%s %s", orderStr, "DESC")
+		}
+
+		elements = append(elements, orderStr)
+	}
+
+	return elements
 }

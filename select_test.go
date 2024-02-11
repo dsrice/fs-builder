@@ -433,6 +433,22 @@ func (s *SelectSuite) Test_SelectString_CrossJoinTable() {
 	assert.Nil(s.T(), err)
 }
 
+func (s *SelectSuite) Test_SelectString_Order() {
+	user := fsb.Table("users").As("u")
+
+	sb := fsb.Select(user.Col("id")).
+		From(user).Order("id")
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(
+		s.T(),
+		"SELECT u.id FROM users AS u ORDER BY id ASC;",
+		sql,
+	)
+	assert.Nil(s.T(), err)
+}
+
 func TestSelectSuite(t *testing.T) {
 	suite.Run(t, new(SelectSuite))
 }
