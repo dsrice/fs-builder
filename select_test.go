@@ -717,6 +717,110 @@ func (s *SelectSuite) Test_SelectString_GroupByColumn() {
 	assert.Nil(s.T(), err)
 }
 
+// Test_SelectString_HavingInt tests the SelectString method in the SelectSuite struct with a HAVING clause that compares the "id" column to the integer 1.
+func (s *SelectSuite) Test_SelectString_HavingInt() {
+	sb := fsb.Select().
+		From(fsb.Table("users")).
+		Having(fsb.Eq("id", 1))
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(s.T(), "SELECT * FROM users HAVING id = 1;", sql)
+	assert.Nil(s.T(), err)
+}
+
+// Test_SelectString_HavingString tests the SelectString method in the SelectSuite struct
+func (s *SelectSuite) Test_SelectString_HavingString() {
+	sb := fsb.Select().
+		From(fsb.Table("users")).
+		Having(fsb.Eq("name", "test"))
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(s.T(), "SELECT * FROM users HAVING name = 'test';", sql)
+	assert.Nil(s.T(), err)
+}
+
+func (s *SelectSuite) Test_SelectString_HavingAND() {
+	sb := fsb.Select().
+		From(fsb.Table("users")).
+		Having(fsb.Eq("name", "test").AND(fsb.Eq("id", 1)))
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(s.T(), "SELECT * FROM users HAVING name = 'test' AND id = 1;", sql)
+	assert.Nil(s.T(), err)
+}
+
+// Test_SelectString_HavingOR tests the SelectString method in the SelectSuite struct.
+func (s *SelectSuite) Test_SelectString_HavingOR() {
+	sb := fsb.Select().
+		From(fsb.Table("users")).
+		Having(fsb.Eq("name", "test").OR(fsb.Eq("id", 1)))
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(s.T(), "SELECT * FROM users HAVING name = 'test' OR id = 1;", sql)
+	assert.Nil(s.T(), err)
+}
+
+// Test_SelectString_HavingAndOr tests the SelectString method in the SelectSuite struct
+// with the Having and Or conditions.
+func (s *SelectSuite) Test_SelectString_HavingAndOr() {
+	sb := fsb.Select().
+		From(fsb.Table("users")).
+		Having(fsb.Eq("name", "test").
+			AND(
+				fsb.Eq("id", 1).OR(fsb.Eq("id", 2)),
+			),
+		)
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(s.T(), "SELECT * FROM users HAVING name = 'test' AND (id = 1 OR id = 2);", sql)
+	assert.Nil(s.T(), err)
+}
+
+// Test_SelectString_HavingOrAnd tests the SelectString method in the SelectSuite struct,
+// specifically testing the functionality of adding having conditions with OR and AND clauses.
+func (s *SelectSuite) Test_SelectString_HavingOrAnd() {
+	sb := fsb.Select().
+		From(fsb.Table("users")).
+		Having(fsb.Eq("name", "test").
+			OR(
+				fsb.Eq("id", 1).AND(fsb.Eq("id", 2)),
+			),
+		)
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(s.T(), "SELECT * FROM users HAVING name = 'test' OR (id = 1 AND id = 2);", sql)
+	assert.Nil(s.T(), err)
+}
+
+// Test_SelectString_HavingMulti tests the SelectString method in the SelectSuite struct with multiple conditions in the HAVING clause.
+func (s *SelectSuite) Test_SelectString_HavingMulti() {
+	sb := fsb.Select().
+		From(fsb.Table("users")).
+		Having(fsb.Eq("name", "test").
+			OR(
+				fsb.Eq("id", 1).AND(fsb.Eq("id", 2)),
+			).
+			AND(
+				fsb.Eq("login_id", "test2").AND(fsb.Eq("name", "name2")),
+			),
+		)
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(
+		s.T(),
+		"SELECT * FROM users HAVING name = 'test' OR (id = 1 AND id = 2) AND login_id = 'test2' AND name = 'name2';",
+		sql,
+	)
+	assert.Nil(s.T(), err)
+}
+
 func TestSelectSuite(t *testing.T) {
 	suite.Run(t, new(SelectSuite))
 }

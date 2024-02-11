@@ -19,6 +19,7 @@ type SelectContainer struct {
 	limit  int
 	offset int
 	group  *GroupByContainer
+	having *Expression
 	errs   []error
 }
 
@@ -101,15 +102,6 @@ func (s *SelectContainer) Where(conditions *Expression) *SelectContainer {
 // - conditions...: optional conditions for the join.
 // Returns:
 // - *SelectContainer: the modified SelectContainer instance with the new join added.
-// Usage example:
-// sb := fsb.Select().
-//
-//	From(fsb.Table("users")).
-//	InnerJoin(fsb.Table("tokens"), fsb.Eq("users.id", "1"))
-//
-// sql, err := sb.ToSQL()
-// Output:
-// "SELECT * FROM users INNER JOIN tokens ON users.id = '1';"
 func (s *SelectContainer) InnerJoin(table *TableContainer, conditions ...*Expression) *SelectContainer {
 	join := JoinContainer{
 		joinType:   inner,
@@ -275,6 +267,12 @@ func createGroupByString(conditions []interface{}) string {
 	return groupStr
 }
 
+func (s *SelectContainer) Having(conditions *Expression) *SelectContainer {
+	s.having = conditions
+
+	return s
+}
+
 // ToSQL
 // It generates a SQL SELECT statement from the configured SelectContainer structure.
 // If any errors exist inside the errs field,
@@ -311,6 +309,10 @@ func (s *SelectContainer) ToSQL() (string, error) {
 
 	if s.group != nil {
 		sqlElements = append(sqlElements, "GROUP BY", s.group.groupColumnStr)
+	}
+
+	if s.having != nil {
+		sqlElements = append(sqlElements, "HAVING", s.having.condition)
 	}
 
 	if len(s.orders) > 0 {
