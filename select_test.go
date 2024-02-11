@@ -717,7 +717,8 @@ func (s *SelectSuite) Test_SelectString_GroupByColumn() {
 	assert.Nil(s.T(), err)
 }
 
-// Test_SelectString_HavingInt tests the SelectString method in the SelectSuite struct with a HAVING clause that compares the "id" column to the integer 1.
+// Test_SelectString_HavingInt tests the SelectString method in the SelectSuite struct
+// with a HAVING clause that compares the "id" column to the integer 1.
 func (s *SelectSuite) Test_SelectString_HavingInt() {
 	sb := fsb.Select().
 		From(fsb.Table("users")).
