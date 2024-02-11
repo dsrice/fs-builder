@@ -530,6 +530,7 @@ func (s *SelectSuite) Test_SelectString_OrderMulti() {
 	assert.Nil(s.T(), err)
 }
 
+// Test_SelectString_OrderAString tests the SelectString method in the SelectSuite struct.
 func (s *SelectSuite) Test_SelectString_OrderAString() {
 	user := fsb.Table("users").As("u")
 
@@ -546,6 +547,7 @@ func (s *SelectSuite) Test_SelectString_OrderAString() {
 	assert.Nil(s.T(), err)
 }
 
+// Test_SelectString_OrderAColumn tests the SelectString_OrderAColumn method in the SelectSuite struct.
 func (s *SelectSuite) Test_SelectString_OrderAColumn() {
 	user := fsb.Table("users").As("u")
 
@@ -562,6 +564,7 @@ func (s *SelectSuite) Test_SelectString_OrderAColumn() {
 	assert.Nil(s.T(), err)
 }
 
+// Test_SelectString_OrderDeString tests the SelectString_OrderDeString method in the SelectSuite struct.
 func (s *SelectSuite) Test_SelectString_OrderDeString() {
 	user := fsb.Table("users").As("u")
 
@@ -578,6 +581,7 @@ func (s *SelectSuite) Test_SelectString_OrderDeString() {
 	assert.Nil(s.T(), err)
 }
 
+// Test_SelectString_OrderDeColumn tests the SelectString method in the SelectSuite struct.
 func (s *SelectSuite) Test_SelectString_OrderDeColumn() {
 	user := fsb.Table("users").As("u")
 
@@ -589,6 +593,40 @@ func (s *SelectSuite) Test_SelectString_OrderDeColumn() {
 	assert.Equal(
 		s.T(),
 		"SELECT u.id FROM users AS u ORDER BY u.id DESC;",
+		sql,
+	)
+	assert.Nil(s.T(), err)
+}
+
+// Test_SelectString_Limit tests the SelectString method in the SelectSuite struct.
+func (s *SelectSuite) Test_SelectString_Limit() {
+	user := fsb.Table("users").As("u")
+
+	sb := fsb.Select(user.Col("id")).
+		From(user).Limit(5)
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(
+		s.T(),
+		"SELECT u.id FROM users AS u LIMIT 5;",
+		sql,
+	)
+	assert.Nil(s.T(), err)
+}
+
+// Test_SelectString_Offset tests the SelectString method in the SelectSuite struct.
+func (s *SelectSuite) Test_SelectString_Offset() {
+	user := fsb.Table("users").As("u")
+
+	sb := fsb.Select(user.Col("id")).
+		From(user).Offset(5)
+
+	sql, err := sb.ToSQL()
+
+	assert.Equal(
+		s.T(),
+		"SELECT u.id FROM users AS u OFFSET 5;",
 		sql,
 	)
 	assert.Nil(s.T(), err)

@@ -16,6 +16,8 @@ type SelectContainer struct {
 	joins  []*JoinContainer
 	where  *Expression
 	orders []*OrderContainer
+	limit  int
+	offset int
 	errs   []error
 }
 
@@ -63,6 +65,8 @@ func Select(fields ...interface{}) *SelectContainer {
 		field:  f,
 		joins:  []*JoinContainer{},
 		orders: []*OrderContainer{},
+		limit:  0,
+		offset: 0,
 	}
 }
 
@@ -230,6 +234,18 @@ func (s *SelectContainer) OrderDe(conditions ...interface{}) *SelectContainer {
 	return s
 }
 
+func (s *SelectContainer) Limit(count int) *SelectContainer {
+	s.limit = count
+
+	return s
+}
+
+func (s *SelectContainer) Offset(count int) *SelectContainer {
+	s.offset = count
+
+	return s
+}
+
 // ToSQL
 // It generates a SQL SELECT statement from the configured SelectContainer structure.
 // If any errors exist inside the errs field,
@@ -266,6 +282,14 @@ func (s *SelectContainer) ToSQL() (string, error) {
 
 	if len(s.orders) > 0 {
 		sqlElements = s.createOrderSQL(sqlElements)
+	}
+
+	if s.limit > 0 {
+		sqlElements = append(sqlElements, fmt.Sprintf("LIMIT %d", s.limit))
+	}
+
+	if s.offset > 0 {
+		sqlElements = append(sqlElements, fmt.Sprintf("OFFSET %d", s.offset))
 	}
 
 	return fmt.Sprintf("%s;", strings.Join(sqlElements, " ")), nil
