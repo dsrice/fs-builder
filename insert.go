@@ -101,7 +101,6 @@ func (ic *InsertContainer) ToSQL() (string, error) {
 			}
 			sqlElements = append(sqlElements, "(", value, ")")
 		}
-
 	} else {
 		ic.errs = append(ic.errs, errors.New("no values provided for insertion"))
 	}
