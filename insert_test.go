@@ -29,6 +29,25 @@ func (s *InsertSuite) Test_InsertMulti() {
 	assert.Nil(s.T(), err)
 }
 
+// Test_InsertCol is a unit test for the InsertCol method
+func (s *InsertSuite) Test_InsertCol() {
+	user := fsb.Table("users")
+	sb := fsb.Insert(user.Col("id")).Into(user).Value(1)
+	sql, err := sb.ToSQL()
+
+	assert.Equal(s.T(), "INSERT INTO users ( users.id ) VALUES ( 1 );", sql)
+	assert.Nil(s.T(), err)
+}
+
+func (s *InsertSuite) Test_InsertMultiValue() {
+	user := fsb.Table("users")
+	sb := fsb.Insert(user.Col("id")).Into(user).Value(1).Value(2)
+	sql, err := sb.ToSQL()
+
+	assert.Equal(s.T(), "INSERT INTO users ( users.id ) VALUES ( 1 ) , ( 2 );", sql)
+	assert.Nil(s.T(), err)
+}
+
 func TestInsertSuite(t *testing.T) {
 	suite.Run(t, new(InsertSuite))
 }

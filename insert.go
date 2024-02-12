@@ -94,7 +94,14 @@ func (ic *InsertContainer) ToSQL() (string, error) {
 	}
 
 	if len(ic.values) > 0 {
-		sqlElements = append(sqlElements, "VALUES", "(", strings.Join(ic.values, ", "), ")")
+		sqlElements = append(sqlElements, "VALUES")
+		for i, value := range ic.values {
+			if i > 0 {
+				sqlElements = append(sqlElements, ",")
+			}
+			sqlElements = append(sqlElements, "(", value, ")")
+		}
+
 	} else {
 		ic.errs = append(ic.errs, errors.New("no values provided for insertion"))
 	}
