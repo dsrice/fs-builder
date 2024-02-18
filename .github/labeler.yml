@@ -1,5 +1,14 @@
 select:
   - select.go
+insert:
+  - insert.go
+update:
+  - update.go
+delete:
+  - delete.go
+  - truncate.go
+table:
+  - table.go
 expression:
   - expression.go
 core:
