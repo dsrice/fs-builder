@@ -1,5 +1,5 @@
 # fsb
-<img src="https://img.shields.io/badge/category-sqlbuilder-blue" />　<img src="https://img.shields.io/github/downloads/dsrice/fsb/total" />　<img src="https://img.shields.io/github/stars/dsrice/fsb" />
+<img src="https://img.shields.io/badge/category-sqlbilder-blue" />　<img src="https://img.shields.io/github/downloads/dsrice/fsb/total" />　<img src="https://img.shields.io/github/stars/dsrice/fsb" />
 
 GoのSQLBuilder
 
