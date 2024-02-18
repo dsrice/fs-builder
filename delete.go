@@ -28,6 +28,11 @@ func (d *DeleteContainer) Where(conditions *Expression) *DeleteContainer {
 	return d
 }
 
+// ToSQL returns the SQL string representation of the delete operation.
+// It checks if there are any errors in the DeleteContainer instance and returns an empty string and the joined errors if any.
+// It constructs the SQL elements for the delete operation: "DELETE FROM" and optionally the table name or table alias.
+// If a table name is present in DeleteContainer, it appends it to the SQL elements,
+// and if a table alias is different from the table name, it appends both the table alias, "AS", and
 func (d *DeleteContainer) ToSQL() (string, error) {
 	if len(d.errs) > 0 {
 		return "", errors.Join(d.errs...)
