@@ -1,6 +1,7 @@
 package fsb
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -59,31 +60,36 @@ func (u *UpdateContainer) Where(conditions *Expression) *UpdateContainer {
 }
 
 func (u *UpdateContainer) ToSQL() (string, error) {
-	var setValues []string
-	var sql string
-
-	for column, value := range u.fields {
-		setValues = append(setValues, fmt.Sprintf("%s = %s", column, ConvertColumn(value, false)))
+	if len(u.errs) > 0 {
+		return "", errors.Join(u.errs...)
 	}
+
+	sqlElements := []string{"UPDATE"}
 
 	if u.table != nil {
 		if u.table.name != u.table.bName {
-			sql = fmt.Sprintf("UPDATE %s AS %s SET", u.table.bName, u.table.name)
+			sqlElements = append(sqlElements, u.table.bName, "AS", u.table.name)
 		} else {
-			sql = fmt.Sprintf("UPDATE %s SET", u.table.name)
+			sqlElements = append(sqlElements, u.table.name)
 		}
 	} else {
 		u.errs = append(u.errs, fmt.Errorf("no set Table"))
 		return "", fmt.Errorf("no set Table")
 	}
 
-	sql = fmt.Sprintf("%s %s", sql, strings.Join(setValues, ", "))
+	sqlElements = append(sqlElements, "SET")
 
-	if u.where != nil {
-		sql += fmt.Sprintf(" WHERE %s", u.where.condition)
+	var setValues []string
+
+	for column, value := range u.fields {
+		setValues = append(setValues, fmt.Sprintf("%s = %s", column, ConvertColumn(value, false)))
 	}
 
-	sql = fmt.Sprintf("%s;", sql)
+	sqlElements = append(sqlElements, strings.Join(setValues, ", "))
 
-	return sql, nil
+	if u.where != nil {
+		sqlElements = append(sqlElements, "WHERE", u.where.condition)
+	}
+
+	return fmt.Sprintf("%s;", strings.Join(sqlElements, " ")), nil
 }
