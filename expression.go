@@ -383,6 +383,12 @@ func ConvertColumn(target interface{}, nFlg bool) string {
 		}
 	case int:
 		return strconv.Itoa(t)
+	case bool:
+		if t {
+			return "true"
+		} else {
+			return "false"
+		}
 	case *ColumnContainer:
 		return fmt.Sprintf("%s.%s", t.tName, t.col)
 	default:

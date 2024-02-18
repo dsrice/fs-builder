@@ -1,5 +1,11 @@
 select:
   - select.go
+insert:
+  - select.go
+update:
+  - select.go
+table:
+  - table.go
 expression:
   - expression.go
 core:
