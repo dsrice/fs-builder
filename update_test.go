@@ -22,10 +22,10 @@ func (s *UpdateSuite) Test_Update() {
 
 // Test_UpdateMulti is a test function that tests the UpdateMulti method of UpdateSuite.
 func (s *UpdateSuite) Test_UpdateMulti() {
-	sb := fsb.Update(fsb.Table("users")).Set("id", 1).Set("name", "test")
+	sb := fsb.Update(fsb.Table("users")).Set("name", "test").Set("id", 1)
 	sql, err := sb.ToSQL()
 
-	assert.Equal(s.T(), "UPDATE users SET id = 1, name = 'test';", sql)
+	assert.Equal(s.T(), "UPDATE users SET name = 'test', id = 1;", sql)
 	assert.Nil(s.T(), err)
 }
 
