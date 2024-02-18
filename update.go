@@ -59,6 +59,11 @@ func (u *UpdateContainer) Where(conditions *Expression) *UpdateContainer {
 	return u
 }
 
+// ToSQL is a method of UpdateContainer that generates a SQL statement for an update operation.
+// It returns the SQL statement as a string and an error if there are any errors.
+// It first checks if there are any errors stored in the UpdateContainer.
+// If there are, it joins the errors and returns them.
+// Then, it starts building the SQL statement by adding the "UPDATE" keyword.
 func (u *UpdateContainer) ToSQL() (string, error) {
 	if len(u.errs) > 0 {
 		return "", errors.Join(u.errs...)
