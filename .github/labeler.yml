@@ -1,9 +1,12 @@
 select:
   - select.go
 insert:
-  - select.go
+  - insert.go
 update:
-  - select.go
+  - update.go
+delete:
+  - delete.go
+  - truncate.go
 table:
   - table.go
 expression:
