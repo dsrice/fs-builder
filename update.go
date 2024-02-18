@@ -68,9 +68,9 @@ func (u *UpdateContainer) ToSQL() (string, error) {
 
 	if u.table != nil {
 		if u.table.name != u.table.bName {
-			sql = fmt.Sprintf("UPDATE %s AS %s SET ", u.table.bName, u.table.name)
+			sql = fmt.Sprintf("UPDATE %s AS %s SET", u.table.bName, u.table.name)
 		} else {
-			sql = fmt.Sprintf("UPDATE %s SET ", u.table.name)
+			sql = fmt.Sprintf("UPDATE %s SET", u.table.name)
 		}
 	} else {
 		u.errs = append(u.errs, fmt.Errorf("no set Table"))
@@ -82,6 +82,8 @@ func (u *UpdateContainer) ToSQL() (string, error) {
 	if u.where != nil {
 		sql += fmt.Sprintf(" WHERE %s", u.where.condition)
 	}
+
+	sql = fmt.Sprintf("%s;", sql)
 
 	return sql, nil
 }
